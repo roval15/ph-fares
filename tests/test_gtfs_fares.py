@@ -31,13 +31,22 @@ class TestGtfsFares:
             text=True,
         )
 
-        fares_csv = DIST_DIR / "fares.txt"
-        assert fares_csv.exists()
+        fare_attributes_csv = DIST_DIR / "fare_attributes.txt"
+        assert fare_attributes_csv.exists()
 
-        with open(fares_csv, newline="") as f:
+        with open(fare_attributes_csv, newline="") as f:
             reader = csv.DictReader(f)
             assert "fare_id" in reader.fieldnames
             assert "price" in reader.fieldnames
-            assert "currency" in reader.fieldnames
+            assert "currency_type" in reader.fieldnames
             assert "payment_method" in reader.fieldnames
             assert "transfers" in reader.fieldnames
+
+        fare_rules_csv = DIST_DIR / "fare_rules.txt"
+        assert fare_rules_csv.exists()
+
+        with open(fare_rules_csv, newline="") as f:
+            reader = csv.DictReader(f)
+            assert "fare_id" in reader.fieldnames
+            assert "route_id" in reader.fieldnames
+            assert len(list(reader)) > 0
