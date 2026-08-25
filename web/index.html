@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ph-Fares — Mandaluyong Pilot</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f5f0;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --accent: #1e3a5f;
+    --accent-light: #e8eef5;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --border: #d1d5db;
+    --border-light: #e5e7eb;
+    --radius: 10px;
+    --max-w: 480px;
+  }
+
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100dvh;
+    padding: 0 0 2rem;
+  }
+
+  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 1rem; }
+
+  /* ---- header ---- */
+  header {
+    background: var(--accent);
+    color: #fff;
+    padding: 1.5rem 0 1.25rem;
+    text-align: center;
+  }
+  header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
+  header p { font-size: 0.875rem; opacity: 0.85; margin-top: 0.25rem; }
+
+  /* ---- section labels ---- */
+  .label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  /* ---- trip selector ---- */
+  .section { margin-top: 1.25rem; }
+
+  .trips { display: flex; flex-direction: column; gap: 0.5rem; }
+  .trip-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .trip-btn:hover { border-color: var(--accent); }
+  .trip-btn.active { border-color: var(--accent); background: var(--accent-light); }
+  .trip-btn .km-badge {
+    font-size: 0.75rem;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .trip-btn.active .km-badge { background: var(--accent); color: #fff; }
+
+  /* ---- distance input ---- */
+  .distance-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 0.75rem;
+  }
+  .distance-row input[type="number"] {
+    width: 6.5rem;
+    padding: 0.625rem 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .distance-row input[type="number"]:focus { border-color: var(--accent); }
+  .distance-row .unit { font-size: 0.875rem; color: var(--muted); font-weight: 500; }
+
+  /* ---- slider ---- */
+  .slider-wrap { margin-top: 0.75rem; }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+
+  /* ---- error ---- */
+  .error-msg {
+    margin-top: 0.75rem;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius);
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+
+  /* ---- fare results ---- */
+  .results { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.625rem; }
+
+  .mode-card {
+    background: var(--card);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .mode-card .mode-name { font-size: 0.875rem; font-weight: 500; }
+  .mode-card .mode-detail { font-size: 0.7rem; color: var(--muted); margin-top: 0.15rem; }
+  .mode-card .fare-amount {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .mode-card .fare-currency { font-size: 0.75rem; font-weight: 400; color: var(--muted); margin-left: 0.15rem; }
+  .mode-card.cheapest {
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .mode-card.cheapest .fare-amount { color: var(--green); }
+
+  .cheapest-badge {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--green);
+    color: #fff;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .mode-unavailable {
+    background: var(--card);
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius);
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .loading { text-align: center; padding: 1.5rem 0; color: var(--muted); font-size: 0.85rem; }
+
+  /* ---- footer ---- */
+  footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>Ph-Fares — Mandaluyong Pilot</h1>
+    <p>Know your fare before you commute</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Preset trips -->
+  <section class="section">
+    <div class="label">Pick a trip</div>
+    <div class="trips" id="trips">
+      <button class="trip-btn active" data-km="2.5">
+        <span>Shaw Blvd &rarr; Ortigas</span>
+        <span class="km-badge">~2.5 km</span>
+      </button>
+      <button class="trip-btn" data-km="1.8">
+        <span>Boni &rarr; Ortigas</span>
+        <span class="km-badge">~1.8 km</span>
+      </button>
+      <button class="trip-btn" data-km="1.2">
+        <span>Mandaluyong City Hall &rarr; Shaw</span>
+        <span class="km-badge">~1.2 km</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Custom distance -->
+  <section class="section">
+    <div class="label">Or enter distance</div>
+    <div class="distance-row">
+      <input type="number" id="km-input" min="0.1" max="50" step="0.1" value="2.5" aria-label="Distance in kilometres">
+      <span class="unit">km</span>
+    </div>
+    <div class="slider-wrap">
+      <input type="range" id="km-slider" min="0.1" max="20" step="0.1" value="2.5" aria-label="Distance slider">
+      <div class="slider-labels"><span>0.1 km</span><span>20 km</span></div>
+    </div>
+    <div class="error-msg" id="error-msg"></div>
+  </section>
+
+  <!-- Fare results -->
+  <section class="section">
+    <div class="label">Fare estimate per mode</div>
+    <div id="results" class="results"><div class="loading">Loading fares&hellip;</div></div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    Estimates only &mdash; actual fares may vary. LTFRB circulars supersede these figures.<br>
+    Pilot data for Mandaluyong City &middot; Data as of Aug 2026
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DISTANCE_MODES = [
+    { id: "jeepney_traditional", label: "Traditional Jeepney", detail: "₱12 base (first 4 km), ₱1.80/km after" },
+    { id: "jeepney_modern",     label: "Modern Jeepney",      detail: "₱14 base (first 4 km), ₱2.20/km after" }
+  ];
+
+  var kmInput   = document.getElementById("km-input");
+  var kmSlider  = document.getElementById("km-slider");
+  var resultsEl = document.getElementById("results");
+  var errorEl   = document.getElementById("error-msg");
+  var tripBtns  = document.querySelectorAll(".trip-btn");
+
+  var debounceTimer = null;
+
+  // -- preset trips -----------------------------------------------------------
+
+  tripBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      tripBtns.forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      var km = parseFloat(btn.getAttribute("data-km"));
+      kmInput.value = km;
+      kmSlider.value = km;
+      fetchFares(km);
+    });
+  });
+
+  // -- custom input -----------------------------------------------------------
+
+  kmInput.addEventListener("input", function () {
+    // deselect presets
+    tripBtns.forEach(function (b) { b.classList.remove("active"); });
+    syncSlider();
+    debouncedFetch();
+  });
+
+  kmSlider.addEventListener("input", function () {
+    tripBtns.forEach(function (b) { b.classList.remove("active"); });
+    kmInput.value = kmSlider.value;
+    debouncedFetch();
+  });
+
+  function syncSlider() {
+    var v = parseFloat(kmInput.value);
+    if (!isNaN(v) && v >= 0.1 && v <= 20) {
+      kmSlider.value = v;
+    }
+  }
+
+  function debouncedFetch() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function () {
+      var km = parseFloat(kmInput.value);
+      fetchFares(km);
+    }, 120);
+  }
+
+  // -- fetch fares -----------------------------------------------------------
+
+  function fetchFares(km) {
+    if (isNaN(km) || km <= 0) {
+      errorEl.textContent = "Please enter a distance greater than 0 km.";
+      errorEl.classList.add("show");
+      resultsEl.innerHTML = "";
+      return;
+    }
+    if (km > 100) {
+      errorEl.textContent = "Maximum distance is 100 km.";
+      errorEl.classList.add("show");
+      resultsEl.innerHTML = "";
+      return;
+    }
+    errorEl.classList.remove("show");
+
+    resultsEl.innerHTML = "<div class=\"loading\">Loading fares&hellip;</div>";
+
+    var pending = DISTANCE_MODES.length;
+    var successful = [];
+    var failed = 0;
+
+    DISTANCE_MODES.forEach(function (mode) {
+      var url = "/api/fare?mode=" + encodeURIComponent(mode.id) + "&km=" + encodeURIComponent(km);
+      fetch(url)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.status === "ok") {
+            successful.push({
+              id: mode.id,
+              label: mode.label,
+              detail: mode.detail,
+              fare: data.fare
+            });
+          } else {
+            failed++;
+          }
+          pending--;
+          if (pending === 0) renderCards(successful, failed);
+        })
+        .catch(function () {
+          failed++;
+          pending--;
+          if (pending === 0) renderCards(successful, failed);
+        });
+    });
+  }
+
+  function renderCards(successful, failed) {
+    if (successful.length === 0) {
+      var msg =
+        '<div class="mode-unavailable">No distance-based fares available for this distance.</div>';
+      if (failed > 0) {
+        msg +=
+          '<div class="mode-unavailable">Something went wrong fetching fares. Please check your connection and try again.</div>';
+      }
+      resultsEl.innerHTML = msg;
+      return;
+    }
+
+    // find cheapest
+    var minFare = Infinity;
+    successful.forEach(function (s) { if (s.fare < minFare) minFare = s.fare; });
+
+    var html = "";
+    successful.forEach(function (s) {
+      var cheapest = s.fare === minFare && successful.length > 1;
+      var cls = "mode-card" + (cheapest ? " cheapest" : "");
+      var badge = cheapest ? '<span class="cheapest-badge">Cheapest</span>' : "";
+      html +=
+        '<div class="' + cls + '">' +
+          '<div>' +
+            '<div class="mode-name">' + escHtml(s.label) + badge + '</div>' +
+            '<div class="mode-detail">' + escHtml(s.detail) + '</div>' +
+          '</div>' +
+          '<div class="fare-amount">₱' + formatFare(s.fare) + '</div>' +
+        '</div>';
+    });
+
+    html +=
+      '<div class="mode-unavailable">' +
+        '<strong>MRT-3</strong> &mdash; serves Mandaluyong (Shaw Blvd, Boni Ave) ' +
+        'but uses station-based pricing, so it is not included in this distance comparison.' +
+      '</div>';
+
+    resultsEl.innerHTML = html;
+  }
+
+  // -- helpers ----------------------------------------------------------------
+
+  function formatFare(n) {
+    // ensure 2 decimal places
+    return n.toFixed(2);
+  }
+
+  function escHtml(s) {
+    var d = document.createElement("div");
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+
+  // -- init -------------------------------------------------------------------
+  fetchFares(parseFloat(kmInput.value));
+
+})();
+</script>
+</body>
+</html>
