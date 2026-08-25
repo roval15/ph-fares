@@ -1,0 +1,1672 @@
+[
+  {
+    "route_id": "LTFRB_PUJ1059",
+    "route_long_name": "Ayala - Pateros via J.P. Rizal",
+    "n_stops_in_bbox": 24
+  },
+  {
+    "route_id": "LTFRB_PUJ1873",
+    "route_long_name": "PATEROS - AYALA",
+    "n_stops_in_bbox": 24
+  },
+  {
+    "route_id": "LTFRB_PUB1134",
+    "route_long_name": "Baclaran - SM Fairview via Lagro, Ayala",
+    "n_stops_in_bbox": 23
+  },
+  {
+    "route_id": "LTFRB_PUJ1360",
+    "route_long_name": "Guadalupe Mkt. - L. Guinto via P. Gil",
+    "n_stops_in_bbox": 23
+  },
+  {
+    "route_id": "LTFRB_PUJ1872",
+    "route_long_name": "PATEROS - AYALA",
+    "n_stops_in_bbox": 23
+  },
+  {
+    "route_id": "LTFRB_PUB1003",
+    "route_long_name": "Alabang Fairview",
+    "n_stops_in_bbox": 22
+  },
+  {
+    "route_id": "LTFRB_PUB1101",
+    "route_long_name": "Alabang-Novaliches via EDSA, MindanaoAve",
+    "n_stops_in_bbox": 22
+  },
+  {
+    "route_id": "LTFRB_PUB1009",
+    "route_long_name": "Alabang Malabon (Letre) via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1011",
+    "route_long_name": "Alabang Malanday",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1012",
+    "route_long_name": "Alabang Malanday",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1015",
+    "route_long_name": "Ayala Grotto (SJDM) via Leveriza",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1017",
+    "route_long_name": "Ayala Malabon via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1019",
+    "route_long_name": "Ayala Monumento via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1023",
+    "route_long_name": "Ayala Novaliches via EDSA Buendia",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1027",
+    "route_long_name": "Ayala UE Caloocan via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1029",
+    "route_long_name": "Baclaran Malabon (Letre) via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1031",
+    "route_long_name": "Baclaran Malanday via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1035",
+    "route_long_name": "Baclaran Navotas via Ayala",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1039",
+    "route_long_name": "Baclaran SJDM via Commonwealth EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1041",
+    "route_long_name": "Baclaran SM Fairview via Lagro",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1043",
+    "route_long_name": "Domestic Grotto via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1045",
+    "route_long_name": "Leveriza Monumento",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1047",
+    "route_long_name": "Navotas Terminal Pacita Complex via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1049",
+    "route_long_name": "Novaliches Baclaran via EDSA Mindanao Ave",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1051",
+    "route_long_name": "Novaliches Pacita San Pedro via Malinta",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1059",
+    "route_long_name": "Taguig City Navotas",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1061",
+    "route_long_name": "Alabang Monumento via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1063",
+    "route_long_name": "Alabang Navotas",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1065",
+    "route_long_name": "Ayala Balintawak",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1067",
+    "route_long_name": "Ayala Fairview via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1069",
+    "route_long_name": "Ayala Grotto via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1071",
+    "route_long_name": "Ayala Lagro via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1073",
+    "route_long_name": "Ayala Malanday via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1077",
+    "route_long_name": "FTI-Monumento via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1079",
+    "route_long_name": "Malanday MIA via Pasay Rtda MOA Coastal Road",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1082",
+    "route_long_name": "Malanday Sucat via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1084",
+    "route_long_name": "Monumento NAIA via EDSA Coastal Rd",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1086",
+    "route_long_name": "Monumento Philcite via Ayala EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1088",
+    "route_long_name": "Monumento Sucat via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1090",
+    "route_long_name": "NAIA SM Fairview",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1093",
+    "route_long_name": "Alabang - Malanday via EDSA, McArthur",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1095",
+    "route_long_name": "Alabang - Navotas Terminal via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1096",
+    "route_long_name": "Alabang - Novaliches via EDSA, NLEX",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1097",
+    "route_long_name": "Alabang - Novaliches via EDSA, NLEX",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1103",
+    "route_long_name": "Alabang-SM Fairview via Lagro Commonwealth",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1112",
+    "route_long_name": "Baclaran - Grotto via Commonwealth Ave",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1113",
+    "route_long_name": "Baclaran - Minuyan via Commonwealth Ave",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1114",
+    "route_long_name": "Baclaran - Minuyan via Commonwealth Ave",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1116",
+    "route_long_name": "Baclaran - Montalban via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1118",
+    "route_long_name": "Baclaran-BgSilang via Edsa Commonwealth",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1120",
+    "route_long_name": "Baclaran-Malanday via Edsa, McArthur",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1121",
+    "route_long_name": "Baclaran-Malanday via Edsa, McArthur",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1123",
+    "route_long_name": "Baclaran-Malanday viaEDSA, McArthur, Ayala",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1124",
+    "route_long_name": "Baclaran-Navotas Terminal via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1125",
+    "route_long_name": "Baclaran-Navotas Terminal via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1127",
+    "route_long_name": "Baclaran-Navotas Terminal via Edsa Ayala",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1129",
+    "route_long_name": "Baclaran-Nvaliches via EDSA Mind AveAyala",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1130",
+    "route_long_name": "Baclaran-Nvaliches via EDSA Mind AveAyala",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1132",
+    "route_long_name": "Baclaran - SM Fairview via Lagro C'wealth",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1140",
+    "route_long_name": "Bagong Silang - NAIA via Maligaya Park, EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1147",
+    "route_long_name": "FTI - Navotas Terminal via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1148",
+    "route_long_name": "FTI - Navotas Terminal via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1149",
+    "route_long_name": "FTI - SM Fairview via Lagro Commonwealth",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1150",
+    "route_long_name": "FTI - SM Fairview via Lagro Commonwealth",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1151",
+    "route_long_name": "FTI - Tungko, SJDM via Lagro, C'wealth Ave EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1152",
+    "route_long_name": "FTI - Tungko, SJDM via Lagro, C'wealth Ave EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1156",
+    "route_long_name": "Grotto - Baclaran via Commonwealth Ave, Ayala",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1158",
+    "route_long_name": "Grotto - NAIA via EDSA, Fairview",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1159",
+    "route_long_name": "Grotto - NAIA via EDSA, Ayala, Buendia Extn",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1160",
+    "route_long_name": "Grotto - NAIA via EDSA, Ayala, Buendia Extn",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1161",
+    "route_long_name": "Lagro - NAIA via Fairview",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1162",
+    "route_long_name": "Lagro - NAIA via Fairview",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1164",
+    "route_long_name": "Malanday - Muntinlupa via Edsa, Monumento",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1170",
+    "route_long_name": "NAIA - Malanday via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1172",
+    "route_long_name": "Norzagaray - Baclaran Via Commonwealth Ave",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1174",
+    "route_long_name": "Norzgry / Spalay-NAIA / Baclrn Via Comm Fairv Ed",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1176",
+    "route_long_name": "Pacita Complex (SP, Lag) - Letre via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1177",
+    "route_long_name": "Pacita Complex - SM Fairview via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1178",
+    "route_long_name": "Pacita Complex - SM Fairview via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1180",
+    "route_long_name": "Pacita Complex - Navotas Term via EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1188",
+    "route_long_name": "San Mateo - Baclaran via EDSA, Ayala, Commonwealth Ave",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1196",
+    "route_long_name": "Taguig - SM Fairview via Lagro Ayala Buendia EDSA",
+    "n_stops_in_bbox": 21
+  },
+  {
+    "route_id": "LTFRB_PUB1001",
+    "route_long_name": "Alabang (Starmall) Lagro",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1033",
+    "route_long_name": "Baclaran Monumento via EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1037",
+    "route_long_name": "Baclaran Novaliches via EDSA Quirino",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1057",
+    "route_long_name": "SM Fairview Ayala Leveriza via EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1092",
+    "route_long_name": "Alabang - Malanday via EDSA, McArthur",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1100",
+    "route_long_name": "Alabang-Novaliches via EDSA, MindanaoAve",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1102",
+    "route_long_name": "Alabang-SM Fairview via Lagro Commonwealth",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1111",
+    "route_long_name": "Baclaran - Grotto via Commonwealth Ave",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1117",
+    "route_long_name": "Baclaran-BgSilang via Edsa Commonwealth",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1119",
+    "route_long_name": "Alabang - Navotas Terminal via EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1122",
+    "route_long_name": "Baclaran-Malanday viaEDSA, McArthur, Ayala",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1128",
+    "route_long_name": "Baclaran-Novaliches via EDSA Mindanao Ave",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1131",
+    "route_long_name": "Baclaran - SM Fairview via Lagro C'wealth",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1133",
+    "route_long_name": "Baclaran - SM Fairview via Lagro, Ayala",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1139",
+    "route_long_name": "Bagong Silang - NAIA via Maligaya Park, EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1155",
+    "route_long_name": "Grotto - Baclaran via Commonwealth Ave, Ayala",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1163",
+    "route_long_name": "Malanday - Muntinlupa via Edsa, Monumento",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1165",
+    "route_long_name": "Malanday Term - NAIA viaEDSA, Buendia, Ayala",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1166",
+    "route_long_name": "Malanday Term - NAIA viaEDSA, Buendia, Ayala",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1169",
+    "route_long_name": "NAIA - Malanday via EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1171",
+    "route_long_name": "Norzagaray - Baclaran Via Commonwealth Ave",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1175",
+    "route_long_name": "Pacita Complex (SP, Lag) - Letre via EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1181",
+    "route_long_name": "Pacita - Novaliches Term via Malinta Ex, EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1182",
+    "route_long_name": "Pacita - Novaliches Term via Malinta Ex, EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1183",
+    "route_long_name": "Pala - pala Dasmarinas Cavite - Navotas Terminal via Edsa",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1184",
+    "route_long_name": "Pala - pala Dasmarinas Cavite - Navotas Terminal via Edsa",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1187",
+    "route_long_name": "San Mateo - Baclaran via EDSA, Ayala, Commonwealth Ave",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1194",
+    "route_long_name": "Sta Maria - Baclaran NLEX EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1195",
+    "route_long_name": "Taguig - SM Fairview via Lagro Ayala Buendia EDSA",
+    "n_stops_in_bbox": 20
+  },
+  {
+    "route_id": "LTFRB_PUB1126",
+    "route_long_name": "Baclaran-Navotas Terminal via Edsa Ayala",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUB1173",
+    "route_long_name": "Norzgry / Spalay-NAIA / Baclrn Via Comm Fairv Ed",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUB1193",
+    "route_long_name": "Sta Maria - Baclaran NLEX EDSA",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ1152",
+    "route_long_name": "Binangonan - JRC via Angono",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ1153",
+    "route_long_name": "Binangonan - JRC via Angono",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ1367",
+    "route_long_name": "Guadalupe (ABC) - Pateros",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ1748",
+    "route_long_name": "GUADALUPE-PATEROS via JP RIZAL",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ1781",
+    "route_long_name": "SHAW BLVD - GUADALUPE",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ1929",
+    "route_long_name": "KALENTONG JRC - P. VICTORINO via P CRUZ",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ2109",
+    "route_long_name": "ANTIPOLO BAYAN - SM TAYTAY ANTIPOLO HILLS",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ2111",
+    "route_long_name": "ANTIPOLO - JRU ROSARIO",
+    "n_stops_in_bbox": 19
+  },
+  {
+    "route_id": "LTFRB_PUJ1002",
+    "route_long_name": "HULO - P. VICTORINO/KALENTONG",
+    "n_stops_in_bbox": 18
+  },
+  {
+    "route_id": "LTFRB_PUJ1060",
+    "route_long_name": "Ayala - Pateros via J.P. Rizal",
+    "n_stops_in_bbox": 18
+  },
+  {
+    "route_id": "LTFRB_PUJ1955",
+    "route_long_name": "EDSA CENTRAL - GUADALUPE via PIONEER",
+    "n_stops_in_bbox": 18
+  },
+  {
+    "route_id": "LTFRB_PUJ2582",
+    "route_long_name": "Pasig-Quiapo via Sta Mesa",
+    "n_stops_in_bbox": 18
+  },
+  {
+    "route_id": "LTFRB_PUJ2583",
+    "route_long_name": "Pasig-Stop Shop",
+    "n_stops_in_bbox": 18
+  },
+  {
+    "route_id": "LTFRB_PUJ2584",
+    "route_long_name": "Pasig-Stop Shop",
+    "n_stops_in_bbox": 18
+  },
+  {
+    "route_id": "LTFRB_PUB1004",
+    "route_long_name": "Alabang Fairview",
+    "n_stops_in_bbox": 17
+  },
+  {
+    "route_id": "LTFRB_PUB1040",
+    "route_long_name": "Baclaran SJDM via Commonwealth EDSA",
+    "n_stops_in_bbox": 17
+  },
+  {
+    "route_id": "LTFRB_PUB1046",
+    "route_long_name": "Leveriza Monumento",
+    "n_stops_in_bbox": 17
+  },
+  {
+    "route_id": "LTFRB_PUB1052",
+    "route_long_name": "Novaliches Pacita San Pedro via Malinta",
+    "n_stops_in_bbox": 17
+  },
+  {
+    "route_id": "LTFRB_PUB1070",
+    "route_long_name": "Ayala Grotto via EDSA",
+    "n_stops_in_bbox": 17
+  },
+  {
+    "route_id": "LTFRB_PUB1107",
+    "route_long_name": "Antipolo-Divisoria via Shaw Blvd",
+    "n_stops_in_bbox": 17
+  },
+  {
+    "route_id": "LTFRB_PUJ1749",
+    "route_long_name": "GUADALUPE-PATEROS via JP RIZAL",
+    "n_stops_in_bbox": 17
+  },
+  {
+    "route_id": "LTFRB_PUJ2310",
+    "route_long_name": "Boni Pinatubo StopnShop via Pinagtipunan",
+    "n_stops_in_bbox": 17
+  },
+  {
+    "route_id": "LTFRB_PUB1002",
+    "route_long_name": "Alabang (Starmall) Lagro",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1018",
+    "route_long_name": "Ayala Malabon via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1028",
+    "route_long_name": "Ayala UE Caloocan via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1030",
+    "route_long_name": "Baclaran Malabon (Letre) via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1032",
+    "route_long_name": "Baclaran Malanday via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1034",
+    "route_long_name": "Baclaran Monumento via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1036",
+    "route_long_name": "Baclaran Navotas via Ayala",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1042",
+    "route_long_name": "Baclaran SM Fairview via Lagro",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1048",
+    "route_long_name": "Navotas Terminal Pacita Complex via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1050",
+    "route_long_name": "Novaliches Baclaran via EDSA Mindanao Ave",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1058",
+    "route_long_name": "SM Fairview Ayala Leveriza via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1060",
+    "route_long_name": "Taguig City Navotas",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1062",
+    "route_long_name": "Alabang Monumento via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1066",
+    "route_long_name": "Ayala Balintawak",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1068",
+    "route_long_name": "Ayala Fairview via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1074",
+    "route_long_name": "Ayala Malanday via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1078",
+    "route_long_name": "FTI-Monumento via EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1080",
+    "route_long_name": "Malanday MIA via Pasay Rtda MOA Coastal Road",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1085",
+    "route_long_name": "Monumento NAIA via EDSA Coastal Rd",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1087",
+    "route_long_name": "Monumento Philcite via Ayala EDSA",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1106",
+    "route_long_name": "Antipolo-Divisoria via Shaw Blvd",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ1001",
+    "route_long_name": "HULO - P. VICTORINO/KALENTONG",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ1366",
+    "route_long_name": "Guadalupe (ABC) - Pateros",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ1368",
+    "route_long_name": "Guadalupe (ABC) - Taguig via Tipas",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ1369",
+    "route_long_name": "Guadalupe (ABC) - Taguig via Tipas",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ1526",
+    "route_long_name": "Pasig (TP) - Quiapo (Echague) via Sta. Mesa, C. Palanca",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ1527",
+    "route_long_name": "Pasig (TP) - Quiapo (Echague) via Sta. Mesa, C. Palanca",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ2036",
+    "route_long_name": "BONI - KALENTONG",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ2110",
+    "route_long_name": "ANTIPOLO BAYAN - SM TAYTAY ANTIPOLO HILLS",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ2112",
+    "route_long_name": "ANTIPOLO - JRU ROSARIO",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUJ2581",
+    "route_long_name": "Pasig-Quiapo via Sta Mesa",
+    "n_stops_in_bbox": 16
+  },
+  {
+    "route_id": "LTFRB_PUB1016",
+    "route_long_name": "Ayala Grotto (SJDM) via Leveriza",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUB1024",
+    "route_long_name": "Ayala Novaliches via EDSA Buendia",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUB1038",
+    "route_long_name": "Baclaran Novaliches via EDSA Quirino",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUB1044",
+    "route_long_name": "Domestic Grotto via EDSA",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUB1072",
+    "route_long_name": "Ayala Lagro via EDSA",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUB1083",
+    "route_long_name": "Malanday Sucat via EDSA",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUB1089",
+    "route_long_name": "Monumento Sucat via EDSA",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUB1091",
+    "route_long_name": "NAIA SM Fairview",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ1049",
+    "route_long_name": "Antipolo - JRC Ortigas/Shaw",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ1189",
+    "route_long_name": "Boni/Pinatubo - Kalentong/JRC",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ1194",
+    "route_long_name": "Boni/Pinatubo - Stop & Shop",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ1195",
+    "route_long_name": "Boni/Pinatubo - Stop & Shop",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ1746",
+    "route_long_name": "GUDALUPE-FTI via J.P.RIZAL Ext. C5",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ1928",
+    "route_long_name": "KALENTONG JRC - P. VICTORINO via P CRUZ",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ2033",
+    "route_long_name": "BONI - STOP N SHOP",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ2034",
+    "route_long_name": "BONI - STOP N SHOP",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUJ2156",
+    "route_long_name": "L GUINTO - MAKATI via SAN ANDRES",
+    "n_stops_in_bbox": 15
+  },
+  {
+    "route_id": "LTFRB_PUB1020",
+    "route_long_name": "Ayala Monumento via EDSA",
+    "n_stops_in_bbox": 14
+  },
+  {
+    "route_id": "LTFRB_PUJ1050",
+    "route_long_name": "Antipolo - JRC Ortigas/Shaw",
+    "n_stops_in_bbox": 14
+  },
+  {
+    "route_id": "LTFRB_PUJ1750",
+    "route_long_name": "GUADALUPE-BUTING",
+    "n_stops_in_bbox": 14
+  },
+  {
+    "route_id": "LTFRB_PUJ1780",
+    "route_long_name": "SHAW BLVD - GUADALUPE",
+    "n_stops_in_bbox": 14
+  },
+  {
+    "route_id": "LTFRB_PUJ2212",
+    "route_long_name": "EDSA Shaw Quiapo via Sta Mesa",
+    "n_stops_in_bbox": 14
+  },
+  {
+    "route_id": "LTFRB_PUB1010",
+    "route_long_name": "Alabang Malabon (Letre) via EDSA",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1213",
+    "route_long_name": "Cartimar - EDSA/Buendia via Bel Air",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1347",
+    "route_long_name": "Fort Bonifacio (Gate III) - Guadalupe",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1362",
+    "route_long_name": "Guadalupe (ABC) - Brgy. Buting, East Rembo via Kalayaan Ave.",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1370",
+    "route_long_name": "Guadalupe (ABC) - FTI via J.P. Rizal Extension",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1619",
+    "route_long_name": "Guadalupe - Cartimar",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1638",
+    "route_long_name": "EDSA/Shaw Central - Morong via Antipolo, Theresa",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1639",
+    "route_long_name": "EDSA/Shaw Central - Morong via Antipolo, Theresa",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1747",
+    "route_long_name": "GUDALUPE-FTI via J.P.RIZAL Ext. C5",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ2031",
+    "route_long_name": "BUENDIA KALAYAAN - F BONIFACIO",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ2032",
+    "route_long_name": "BUENDIA KALAYAAN - F BONIFACIO",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ2210",
+    "route_long_name": "EDSA SHAW Guadalupe via S MAdre",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ2220",
+    "route_long_name": "Guadalupe Pateros",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ2309",
+    "route_long_name": "Boni Pinatubo StopnShop via Pinagtipunan",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ2512",
+    "route_long_name": "Kalentong-Malinao",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ2513",
+    "route_long_name": "Kalentong-Malinao",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ2515",
+    "route_long_name": "Kalentong-Sierra Madre via 9dePebrero",
+    "n_stops_in_bbox": 13
+  },
+  {
+    "route_id": "LTFRB_PUJ1346",
+    "route_long_name": "Fort Bonifacio (Gate III) - Guadalupe",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ1363",
+    "route_long_name": "Guadalupe (ABC) - Brgy. Buting, East Rembo via Kalayaan Ave.",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ1371",
+    "route_long_name": "Guadalupe (ABC) - FTI via J.P. Rizal Extension",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ1778",
+    "route_long_name": "SHAW BLVD - ORTIGAS",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ1954",
+    "route_long_name": "EDSA CENTRAL - GUADALUPE via PIONEER",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ2027",
+    "route_long_name": "BUENDIA LRT TAFT - GUADALUPE",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ2028",
+    "route_long_name": "BUENDIA LRT TAFT - GUADALUPE",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ2155",
+    "route_long_name": "L GUINTO - MAKATI via SAN ANDRES",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ2211",
+    "route_long_name": "EDSA Shaw Quiapo via Sta Mesa",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ2219",
+    "route_long_name": "Guadalupe Pateros",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ2514",
+    "route_long_name": "Kalentong-Sierra Madre via 9dePebrero",
+    "n_stops_in_bbox": 12
+  },
+  {
+    "route_id": "LTFRB_PUJ1192",
+    "route_long_name": "Boni (Robinson's Complex) - Kalentong/JRC",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1212",
+    "route_long_name": "Cartimar - EDSA/Buendia via Bel Air",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1321",
+    "route_long_name": "EDSA/Shaw Central - Taytay",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1372",
+    "route_long_name": "AFP/PNP Housing (Taguig) - Guadalupe (ABC) via Bayani Road",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1373",
+    "route_long_name": "AFP/PNP Housing (Taguig) - Guadalupe (ABC) via Bayani Road",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1618",
+    "route_long_name": "Guadalupe - Cartimar",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1820",
+    "route_long_name": "SHAW BLVD CENTRAL - TAYTAY",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1900",
+    "route_long_name": "MARKET MARKET - GUADALUPE",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1901",
+    "route_long_name": "MARKET MARKET - GUADALUPE",
+    "n_stops_in_bbox": 11
+  },
+  {
+    "route_id": "LTFRB_PUJ1188",
+    "route_long_name": "Boni/Pinatubo - Kalentong/JRC",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ1193",
+    "route_long_name": "Boni (Robinson's Complex) - Kalentong/JRC",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ1312",
+    "route_long_name": "EDSA/Shaw Central - Kalentong/JRC",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ1313",
+    "route_long_name": "EDSA/Shaw Central - Kalentong/JRC",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ1315",
+    "route_long_name": "EDSA/Shaw Central - Morong via Binangonan, Cardona",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ1612",
+    "route_long_name": "Guadalupe-Makati",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ1779",
+    "route_long_name": "SHAW BLVD - ORTIGAS",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ1819",
+    "route_long_name": "SHAW BLVD CENTRAL - TAYTAY",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ2035",
+    "route_long_name": "BONI - KALENTONG",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ2060",
+    "route_long_name": "BERNARDINO - DELPAN",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ2157",
+    "route_long_name": "GUADALUPE IBABAW - AYALA",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ2217",
+    "route_long_name": "Guadalupe FTI v JP Rizal",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ2218",
+    "route_long_name": "Guadalupe FTI v JP Rizal",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ2325",
+    "route_long_name": "Guadalupe Cartimar via Roxas Blvd",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ2326",
+    "route_long_name": "Guadalupe Cartimar via Roxas Blvd",
+    "n_stops_in_bbox": 10
+  },
+  {
+    "route_id": "LTFRB_PUJ1190",
+    "route_long_name": "Boni - Kalentong/JRC via Boni Ave.",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1191",
+    "route_long_name": "Boni - Kalentong/JRC via Boni Ave.",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1253",
+    "route_long_name": "Del Pan Guadalupe (Ibabaw)",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1306",
+    "route_long_name": "EDSA/Pioneer - Pateros via Pasig",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1307",
+    "route_long_name": "EDSA/Pioneer - Pateros via Pasig",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1314",
+    "route_long_name": "EDSA/Shaw Central - Morong via Binangonan, Cardona",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1359",
+    "route_long_name": "Guadalupe Mkt. - L. Guinto via Pasig Line",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1361",
+    "route_long_name": "Guadalupe Mkt. - L. Guinto via P. Gil",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1613",
+    "route_long_name": "Guadalupe-Makati",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1636",
+    "route_long_name": "EDSA/Shaw Central - Morong",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1637",
+    "route_long_name": "EDSA/Shaw Central - Morong",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ2158",
+    "route_long_name": "GUADALUPE IBABAW - AYALA",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ2205",
+    "route_long_name": "EDSA Shaw Angono",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ2307",
+    "route_long_name": "Boni Pinatubo Kalentong JRU",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ2308",
+    "route_long_name": "Boni Pinatubo Kalentong JRU",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ2577",
+    "route_long_name": "NPasig-Crossing via Taytay",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ2597",
+    "route_long_name": "Angono EDSA Shaw Blvd",
+    "n_stops_in_bbox": 9
+  },
+  {
+    "route_id": "LTFRB_PUJ1252",
+    "route_long_name": "Del Pan Guadalupe (Ibabaw)",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUJ1310",
+    "route_long_name": "EDSA/Shaw - E. Rodriguez (Ugong) via J. Vargas Ave.",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUJ1317",
+    "route_long_name": "EDSA - Shaw - Ortigas Complex",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUJ1640",
+    "route_long_name": "EDSA/Shaw Central - Tanay via Antipolo",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUJ1643",
+    "route_long_name": "Tanay - Robinson Galleria via Antipolo San Miguel",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUJ2209",
+    "route_long_name": "EDSA SHAW Guadalupe via S MAdre",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUJ2280",
+    "route_long_name": "Ayala Guadalupe Ibabaw via JP Rizal",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUJ2327",
+    "route_long_name": "Guadalupe Delpan MRT",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUJ2578",
+    "route_long_name": "NPasig-Crossing via Taytay",
+    "n_stops_in_bbox": 8
+  },
+  {
+    "route_id": "LTFRB_PUB1005",
+    "route_long_name": "Alabang Lawton via Sucat",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ1311",
+    "route_long_name": "EDSA/Shaw - E. Rodriguez (Ugong) via J. Vargas Ave.",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ1323",
+    "route_long_name": "Edsa/Shaw.Central -Tipas (Taguig) via San Joaquin",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ1578",
+    "route_long_name": "Rosario Jct. - San Juan via Pinaglabanan, Ortigas",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ1580",
+    "route_long_name": "San Juan (Pinaglabanan) - San Juan, Taytay (Resettlement Area)",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ1581",
+    "route_long_name": "San Juan (Pinaglabanan) - San Juan, Taytay (Resettlement Area)",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ1845",
+    "route_long_name": "SAN JUAN UNIMART - ROSARIO JUNCTION (DE CASTRO)",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ1846",
+    "route_long_name": "SAN JUAN UNIMART - ROSARIO JUNCTION (DE CASTRO)",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ1957",
+    "route_long_name": "EDSA CENTR - SAN JOAQUIN",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ2059",
+    "route_long_name": "BERNARDINO - DELPAN",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ2281",
+    "route_long_name": "Ayala Guadalupe Ibabaw via JP Rizal",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ2591",
+    "route_long_name": "Rosario Jct-San Juan via Pinaglabanan",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUJ2595",
+    "route_long_name": "Taytay-Rosario",
+    "n_stops_in_bbox": 7
+  },
+  {
+    "route_id": "LTFRB_PUB1142",
+    "route_long_name": "Cainta - Quiapo via Ortigas Ave, Magsaysay Blvd",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUB1197",
+    "route_long_name": "Taytay  - Quiapo via Manila East Road",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUB1198",
+    "route_long_name": "Taytay  - Quiapo via Manila East Road",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUJ1047",
+    "route_long_name": "Antipolo - EDSA/Shaw Blvd.",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUJ1322",
+    "route_long_name": "Edsa/Shaw.Central -Tipas (Taguig) via San Joaquin",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUJ1956",
+    "route_long_name": "EDSA CENTR - SAN JOAQUIN",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUJ2208",
+    "route_long_name": "EDSA Shaw E Rodriguez Ortigas Ave",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUJ2215",
+    "route_long_name": "Guadalupe Cartimar GilPuyat Buendia",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUJ2592",
+    "route_long_name": "Rosario Jct-San Juan via Pinaglabanan",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUJ2596",
+    "route_long_name": "Taytay-Rosario",
+    "n_stops_in_bbox": 6
+  },
+  {
+    "route_id": "LTFRB_PUB1141",
+    "route_long_name": "Cainta - Quiapo via Ortigas Ave, Magsaysay Blvd",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ1048",
+    "route_long_name": "Antipolo - EDSA/Shaw Blvd.",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ1148",
+    "route_long_name": "Bel-Air-Washington",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ1149",
+    "route_long_name": "Bel-Air-Washington",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ1318",
+    "route_long_name": "EDSA/Shaw Central - Pasig (TP)",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ1319",
+    "route_long_name": "EDSA/Shaw Central - Pasig (TP)",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ2061",
+    "route_long_name": "BEL AIR - WASHINGTON",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ2062",
+    "route_long_name": "BEL AIR - WASHINGTON",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ2207",
+    "route_long_name": "EDSA Shaw E Rodriguez Ortigas Ave",
+    "n_stops_in_bbox": 5
+  },
+  {
+    "route_id": "LTFRB_PUJ2338",
+    "route_long_name": "Landmark Puregold Loop",
+    "n_stops_in_bbox": 4
+  },
+  {
+    "route_id": "LTFRB_PUJ2492",
+    "route_long_name": "Binangonan-Shaw Blvd",
+    "n_stops_in_bbox": 4
+  },
+  {
+    "route_id": "LTFRB_PUJ2598",
+    "route_long_name": "Angono EDSA Shaw Blvd",
+    "n_stops_in_bbox": 4
+  },
+  {
+    "route_id": "LTFRB_PUJ1316",
+    "route_long_name": "EDSA - Shaw - Ortigas Complex",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ1870",
+    "route_long_name": "PATEROS - MARKET MARKET",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ1899",
+    "route_long_name": "MARKET MARKET - NASCOR",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ1918",
+    "route_long_name": "MAKATI P BURGOS - L GUINTO",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ2091",
+    "route_long_name": "AYALA LANDMARK - PUREGOLD",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ2092",
+    "route_long_name": "AYALA LANDMARK - PUREGOLD",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ2094",
+    "route_long_name": "AYALA - ZAPOTE RD",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ2206",
+    "route_long_name": "EDSA Shaw Angono",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ2213",
+    "route_long_name": "EDSA Shaw Central San Joaquin",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ2337",
+    "route_long_name": "Landmark Puregold Loop",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ2489",
+    "route_long_name": "Binangonan-EDSA Shaw via Angono",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUJ2493",
+    "route_long_name": "Binangonan-Shaw Blvd",
+    "n_stops_in_bbox": 3
+  },
+  {
+    "route_id": "LTFRB_PUB1145",
+    "route_long_name": "Eastwood Libis - Marriot Terminal via Acropolis",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUB1146",
+    "route_long_name": "Eastwood Libis - Marriot Terminal via Acropolis",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ1278",
+    "route_long_name": "Divisoria - Punta via Sta. Mesa",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ1279",
+    "route_long_name": "Divisoria - Punta via Sta. Mesa",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ1562",
+    "route_long_name": "Punta - Quiapo (Barbosa) via Sta. Mesa",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ1563",
+    "route_long_name": "Punta - Quiapo (Barbosa) via Sta. Mesa",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ1564",
+    "route_long_name": "Punta - Pier via Manila City Hall",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ1565",
+    "route_long_name": "Punta - Pier via Manila City Hall",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ1871",
+    "route_long_name": "PATEROS - MARKET MARKET",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ1898",
+    "route_long_name": "MARKET MARKET - NASCOR",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ2355",
+    "route_long_name": "Namayan Vergara",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ2356",
+    "route_long_name": "Namayan Vergara",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ2373",
+    "route_long_name": "Ortigas Complex Robinsons Galleria",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ2516",
+    "route_long_name": "Kalentong JRC-Namayan via P Martinez",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUJ2517",
+    "route_long_name": "Kalentong JRC-Namayan via P Martinez",
+    "n_stops_in_bbox": 2
+  },
+  {
+    "route_id": "LTFRB_PUB1026",
+    "route_long_name": "Ayala Quiapo via Kamagong Taft",
+    "n_stops_in_bbox": 1
+  },
+  {
+    "route_id": "LTFRB_PUJ1919",
+    "route_long_name": "MAKATI P BURGOS - L GUINTO",
+    "n_stops_in_bbox": 1
+  },
+  {
+    "route_id": "LTFRB_PUJ2214",
+    "route_long_name": "EDSA Shaw Central San Joaquin",
+    "n_stops_in_bbox": 1
+  },
+  {
+    "route_id": "LTFRB_PUJ2403",
+    "route_long_name": "Quiapo (Barbosa) San Juan via Legarda",
+    "n_stops_in_bbox": 1
+  },
+  {
+    "route_id": "LTFRB_PUJ2404",
+    "route_long_name": "Quiapo (Barbosa) San Juan via Legarda",
+    "n_stops_in_bbox": 1
+  }
+]
