@@ -1,0 +1,85 @@
+{
+  "route_id": "ROUTE_880854",
+  "route_short_name": "MRT-3",
+  "route_long_name": "Taft Ave - North Ave",
+  "stations": [
+    {
+      "stop_id": "LTFRB_4976",
+      "stop_name": "Taft Ave MRT",
+      "lat": 14.5376,
+      "lon": 121.001
+    },
+    {
+      "stop_id": "LTFRB_4975",
+      "stop_name": "Magellanes MRT ",
+      "lat": 14.5421,
+      "lon": 121.02
+    },
+    {
+      "stop_id": "LTFRB_4974",
+      "stop_name": "Ayala MRT",
+      "lat": 14.5492,
+      "lon": 121.028
+    },
+    {
+      "stop_id": "LTFRB_4973",
+      "stop_name": "Buendia MRT",
+      "lat": 14.5541,
+      "lon": 121.034
+    },
+    {
+      "stop_id": "LTFRB_4972",
+      "stop_name": "Guadalupe MRT ",
+      "lat": 14.5666,
+      "lon": 121.045
+    },
+    {
+      "stop_id": "LTFRB_4971",
+      "stop_name": "Boni MRT ",
+      "lat": 14.5729,
+      "lon": 121.048
+    },
+    {
+      "stop_id": "LTFRB_4970",
+      "stop_name": "Shaw MRT ",
+      "lat": 14.581,
+      "lon": 121.054
+    },
+    {
+      "stop_id": "LTFRB_4969",
+      "stop_name": "Ortigas MRT",
+      "lat": 14.5878,
+      "lon": 121.057
+    },
+    {
+      "stop_id": "LTFRB_4968",
+      "stop_name": "Santolan MRT",
+      "lat": 14.6075,
+      "lon": 121.057
+    },
+    {
+      "stop_id": "LTFRB_4967",
+      "stop_name": "Cubao MRT",
+      "lat": 14.6194,
+      "lon": 121.051
+    },
+    {
+      "stop_id": "LTFRB_4966",
+      "stop_name": "Kamuning MRT",
+      "lat": 14.6352,
+      "lon": 121.043
+    },
+    {
+      "stop_id": "LTFRB_4965",
+      "stop_name": "Quezon MRT",
+      "lat": 14.6426,
+      "lon": 121.039
+    },
+    {
+      "stop_id": "STOP_880847",
+      "stop_name": "North Avenue MRT",
+      "lat": 14.6517695249,
+      "lon": 121.0323429108
+    }
+  ]
+}
