@@ -142,7 +142,88 @@ Acceptance criteria (mechanical):
 - Page includes ≥3 preset trips and renders the mode comparison for one.
 - No npm/node artifacts committed.
 
-### 7. README.md
+### 7. Epic E6: Commute Guide — Location 1 to Location 2 (Level A: direct routes)
+
+**Goal:** user enters origin + destination → gets a commute guide with fare
+breakdown per mode. Designed so Level B (multi-leg transfers) extends it
+later WITHOUT schema rework.
+
+**Design-for-B requirements (binding):**
+- Itinerary is a LIST OF LEGS (`walk` / `ride` / later `transfer-wait`) —
+  multi-leg journeys are just longer lists, no schema change.
+- Finder primitives are pure, composable functions with docstrings noting
+  how Level B's BFS over the transfer graph reuses them:
+  `nearest_stops`, `routes_at_stop`, `ride_segment(route, stop_a, stop_b)`.
+- Geocode cache persists (Level B needs it too).
+
+#### S6.1 — Stops dataset + geocode layer
+- `tools/extract_stops.py` from sakayph/gtfs (scratch clone, NEVER committed):
+  - `data/stops_mandaluyong.json`: stops inside pilot bbox EXPANDED by a
+    0.02° margin: `{stop_id, stop_name, lat, lon, route_ids[]}`.
+  - `data/stop_sequences.json`: for each route in routes_mandaluyong.json,
+    the stop sequence of its most-stops trip, incl. `shape_dist_traveled`
+    where present in stop_times.txt.
+  - MRT-3 stations (route_type=2 rail) with coords — must include Shaw Blvd
+    and Boni stations.
+- `guide/geocode.py`: `geocode(query)` → candidates
+  `[{display_name, lat, lon}]` via Nominatim:
+  `https://nominatim.openstreetmap.org/search?q=<q>&format=jsonv2&limit=5&countrycodes=ph`
+  with a descriptive User-Agent header (Nominatim ToS requires it), max
+  1 request/sec, results cached persistently in `data/geocode_cache.json`.
+- Unit tests mock HTTP (no live network in tests); determinism check on the
+  extractor.
+
+AC: (1) stops file non-empty, every stop has lat/lon/route_ids; (2)
+stop_sequences covers ≥90% of routes_mandaluyong.json with ≥2 stops each;
+(3) MRT-3 stations include Shaw + Boni (case-insensitive); (4) repeated
+geocode of the same query makes zero HTTP calls the second time (mock test).
+
+#### S6.2 — Route finder core
+- `guide/finder.py`: `nearest_stops(lat, lon, radius_m=400)` (haversine);
+  `candidate_direct_routes(from, to, walk_radius_m=400)` → candidates with
+  board_stop, alight_stop, ride_km, walk_from_m, walk_to_m.
+- `ride_km` computed ALONG THE ROUTE: `shape_dist_traveled` at alight stop
+  minus board stop; fallback = sum of haversine between consecutive stops in
+  sequence. NEVER straight-line origin→destination.
+- `guide/planner.py`: `plan(from, to)` → options sorted cheapest-first, each:
+  `{legs: [...], fare_breakdown: {mode: fare}}` using `phfares.fare(mode,
+  ride_km)`; MRT-3 option appears only when both points are within 600 m of
+  MRT-3 stations, priced via dataset station_bands (station count between
+  them) with the active-discount note surfaced.
+- No-route case returns a structured "no direct route found" result (friendly,
+  machine-readable) — not an exception.
+- Unit tests with synthetic fixtures: curved-route test proving ride_km is
+  along-route not straight-line; plan() end-to-end on fixtures; MRT-3 gating.
+
+AC: (1) `uv run --with pytest python -m pytest tests/ -q` green; (2) fixture
+plan() returns walk+ride+walk legs with fares matching phfares math; (3)
+curved-route test passes; (4) MRT-3 option gated correctly.
+
+#### S6.3 — Plan API + UI v2
+- `web/server.py` additions: `GET /api/geocode?q=` → JSON candidates;
+  `GET /api/plan?from_lat=&from_lon=&to_lat=&to_lon=` → JSON itinerary.
+- `web/index.html` v2, two tabs:
+  1. **Commute Guide** (default): origin + destination text inputs →
+     candidate picker (tap to confirm) → Plan → leg cards (walk m, ride
+     route/boarding stops/distance) + fare breakdown per mode with CHEAPEST
+     badge + MRT-3 card when applicable.
+  2. **Fare Calculator** — existing page preserved verbatim (regression:
+     7.5 km traditional = 18.30).
+- Mobile-first 375px, no npm, no maps. Friendly errors for no-results and
+  no-route cases.
+
+AC: (1) `/api/geocode?q=Shaw` returns ≥1 candidate with lat/lon; (2)
+`/api/plan` between real Mandaluyong points returns legs + fare breakdown
+matching phfares math; (3) both tabs work; calculator regression intact;
+(4) no npm artifacts; viewport OK; no-route and no-geocode cases return
+friendly JSON/UI messages.
+
+#### E6 Gate
+Commuter simulation with real trips (Mandaluyong City Hall → Ortigas; Shaw →
+Boni; one out-of-coverage destination → friendly handling), then merge to
+main + push to the existing GitHub repo + Telegram notify.
+
+### 8. README.md
 
 What this is, the pilot scope, the data availability table above, how to
 use the library, how to contribute fare updates (PR with source citation),
