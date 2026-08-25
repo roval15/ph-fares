@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "currency": "PHP",
+  "as_of": "2026-08-25",
+  "region": {
+    "pilot_city": "Mandaluyong",
+    "bbox": [14.555, 121.025, 14.600, 121.065]
+  },
+  "modes": {
+    "jeepney_traditional": {
+      "fare_model": "distance",
+      "base_fare": 12.0,
+      "base_km": 4.0,
+      "per_km": 1.80,
+      "status": "verified",
+      "source": "LTFRB fare structure; corroborated by community encodings (github.com/Drawde0731/jeepney-fare-calculator, github.com/wwinz0/bayad-po)",
+      "as_of": "2026-08-25"
+    },
+    "jeepney_modern": {
+      "fare_model": "distance",
+      "base_fare": 14.0,
+      "base_km": 4.0,
+      "per_km": 2.20,
+      "status": "verified",
+      "source": "LTFRB fare structure; corroborated by community encodings (github.com/Drawde0731/jeepney-fare-calculator, github.com/wwinz0/bayad-po)",
+      "as_of": "2026-08-25"
+    },
+    "mrt3": {
+      "fare_model": "station_table",
+      "station_bands": [
+        { "min_stations": 1, "max_stations": 2, "fare": 13 },
+        { "min_stations": 3, "max_stations": 4, "fare": 16 },
+        { "min_stations": 5, "max_stations": 7, "fare": 20 },
+        { "min_stations": 8, "max_stations": 10, "fare": 24 },
+        { "min_stations": 11, "max_stations": 11, "fare": 28 }
+      ],
+      "concessions": [
+        { "note": "Children below 1.02 m ride free" }
+      ],
+      "status": "verified",
+      "source": "https://en.wikipedia.org/wiki/MRT_Line_3_(Metro_Manila) — section 'Fares and ticketing' (accessed 2026-08-25)",
+      "as_of": "2026-08-25",
+      "notes": "Fares 50% discounted since 2026-03-23 (fuel-cost relief measure per same source); the table reflects published pre-discount fares."
+    }
+  }
+}
