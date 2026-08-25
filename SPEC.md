@@ -112,7 +112,37 @@ Minimum coverage:
   inside/outside the bbox
 - gtfs_fares.py: output parses as CSV with required GTFS columns
 
-### 6. README.md
+### 6. Pilot UI/UX experience (epic E4)
+
+**Goal:** a simple, no-maps web experience that lets us feel and critique the
+user journey before investing in real map integration. Pilot artifact only.
+
+User journey to prototype (single page, mobile-first):
+1. Commuter lands on the page → sees the Mandaluyong pilot branding + one-line
+   purpose ("Know your fare before you commute").
+2. Picks a **preset trip** (e.g. Shaw Blvd → Ortigas ~2.5 km, Boni → Ortigas
+   ~1.8 km, Mandaluyong City Hall → Shaw ~1.2 km) OR types a custom distance.
+3. Page shows the fare **per available mode** (traditional jeepney, modern
+   jeepney, MRT-3 when in dataset) as a comparison — cheapest highlighted.
+4. Optionally a "what if" slider adjusting distance to see fares move live.
+
+Technical constraints:
+- Python stdlib HTTP server (`http.server`) or FastAPI — coder's choice,
+  document it. Frontend: ONE static HTML file + inline/small CSS+JS. No build
+  step, no npm.
+- Small JSON API endpoint: `GET /api/fare?mode=<mode>&km=<n>` → JSON fare,
+  backed by the `phfares` library (imported from repo root).
+- Must work at 375px width (mobile). Clean, calm design; honest pilot copy.
+- `web/` directory in repo; README documents how to run it.
+
+Acceptance criteria (mechanical):
+- `python3 web/server.py` (or documented command) starts and serves `/`
+  returning HTML that mentions Mandaluyong.
+- `curl /api/fare?mode=jeepney_traditional&km=7.5` returns JSON with fare 18.30.
+- Page includes ≥3 preset trips and renders the mode comparison for one.
+- No npm/node artifacts committed.
+
+### 7. README.md
 
 What this is, the pilot scope, the data availability table above, how to
 use the library, how to contribute fare updates (PR with source citation),
