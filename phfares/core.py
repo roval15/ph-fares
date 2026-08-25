@@ -6,6 +6,21 @@ from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 
+class Fare(Decimal):
+    __slots__ = ()
+
+    def __repr__(self):
+        return super().__repr__()
+
+    def __eq__(self, other):
+        if isinstance(other, float):
+            return super().__eq__(Decimal(str(other)))
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return super().__hash__()
+
+
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _FARES_PATH = _DATA_DIR / "fares.json"
 _ROUTES_PATH = _DATA_DIR / "routes_mandaluyong.json"
@@ -22,7 +37,7 @@ def stop_in_bbox(lat: float, lon: float, bbox: list[float]) -> bool:
     return south <= lat <= north and west <= lon <= east
 
 
-def fare(mode: str, km: float = 0) -> Decimal:
+def fare(mode: str, km: float = 0) -> Fare:
     if km <= 0:
         raise ValueError(f"km must be positive, got {km}")
 
@@ -58,7 +73,7 @@ def fare(mode: str, km: float = 0) -> Decimal:
     else:
         result = base_fare + per_km * (km_dec - base_km)
 
-    return result.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return Fare(result.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
 
 
 def routes_for(city: str) -> list[dict]:

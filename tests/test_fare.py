@@ -65,3 +65,21 @@ class TestErrors:
     def test_station_table_mode_message(self):
         with pytest.raises(KeyError, match="not distance-based"):
             fare("mrt3", km=5)
+
+
+class TestMechanicalAcceptance:
+    def test_modern_5km_equals_float_16_20(self):
+        assert fare("jeepney_modern", 5) == 16.20
+
+    def test_traditional_75km_equals_float_18_30(self):
+        assert fare("jeepney_traditional", 7.5) == 18.30
+
+    def test_traditional_4km_equals_float_12(self):
+        assert fare("jeepney_traditional", 4) == 12.0
+
+    def test_still_decimal_and_str(self):
+        r = fare("jeepney_modern", 5)
+        assert isinstance(r, Decimal) and str(r) == "16.20"
+
+    def test_int_equality(self):
+        assert fare("jeepney_modern", 4) == 14
