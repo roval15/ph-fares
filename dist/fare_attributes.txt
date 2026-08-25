@@ -1,0 +1,3 @@
+fare_id,price,currency_type,payment_method,transfers
+puj_traditional_base,12.00,PHP,0,0
+pub_citybus_unverified_uses_puj_base,12.00,PHP,0,0
