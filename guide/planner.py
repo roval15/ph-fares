@@ -67,6 +67,48 @@ def _sort_options(options: list[dict], tier_of) -> None:
     )
 
 
+def _ride_shape(
+    sequences: list[dict],
+    route_id: str,
+    board_stop: dict,
+    alight_stop: dict,
+) -> list[list[float]]:
+    """Return ordered [[lat,lon], ...] from BOARD stop to ALIGHT stop inclusive.
+
+    Searches *sequences* for the matching route_id, locates the board and
+    alight stops by stop_id, and slices between them.  If the stored sequence
+    runs opposite to travel direction (board index > alight index), the slice
+    is reversed so the result always starts at the board stop and ends at the
+    alight stop.
+
+    Fallback (route not found or stop_id missing): two-point polyline.
+    """
+    board_id = board_stop["stop_id"]
+    alight_id = alight_stop["stop_id"]
+    fallback = [[board_stop["lat"], board_stop["lon"]],
+                [alight_stop["lat"], alight_stop["lon"]]]
+
+    for seq in sequences:
+        if seq["route_id"] != route_id:
+            continue
+        stops = seq["stops"]
+        board_idx: int | None = None
+        alight_idx: int | None = None
+        for i, s in enumerate(stops):
+            if s["stop_id"] == board_id:
+                board_idx = i
+            if s["stop_id"] == alight_id:
+                alight_idx = i
+        if board_idx is None or alight_idx is None:
+            return fallback
+        if board_idx <= alight_idx:
+            return [[s["lat"], s["lon"]] for s in stops[board_idx:alight_idx + 1]]
+        else:
+            return [[s["lat"], s["lon"]] for s in stops[alight_idx:board_idx + 1][::-1]]
+
+    return fallback
+
+
 def plan(
     from_lat: float,
     from_lon: float,
@@ -81,6 +123,9 @@ def plan(
     ``{"status": "no_route", "message": "...", "from": {...}, "to": {...}}``.
     """
     options: list[dict] = []
+
+    # Load sequences once for shape computation
+    sequences = _load_sequences()
 
     # --- Jeepney options ---
     candidates = candidate_direct_routes(
@@ -114,6 +159,8 @@ def plan(
                     "board_stop": cand["board_stop"],
                     "alight_stop": cand["alight_stop"],
                     "distance_km": ride_km,
+                    "shape": _ride_shape(sequences, cand["route_id"],
+                                         cand["board_stop"], cand["alight_stop"]),
                 },
                 {
                     "type": "walk",
@@ -181,6 +228,8 @@ def plan(
                         "board_stop": mrt_from,
                         "alight_stop": mrt_to,
                         "distance_km": round(ride_m / 1000, 3),
+                        "shape": _ride_shape(sequences, mrt3_data["route_id"],
+                                             mrt_from, mrt_to),
                     },
                     {
                         "type": "walk",

@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ph-Fares — Mandaluyong Pilot</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -20,6 +22,8 @@
     --border-light: #e5e7eb;
     --radius: 10px;
     --max-w: 480px;
+    --blue: #2563eb;
+    --walk: #9ca3af;
   }
 
   html { font-size: 16px; -webkit-text-size-adjust: 100%; }
@@ -380,6 +384,42 @@
   .leg-card .leg-mode { font-weight: 600; }
   .leg-card .leg-detail { color: var(--muted); font-size: 0.75rem; margin-top: 0.1rem; }
 
+  /* ---- interactive leg cards (route map) ---- */
+  .leg-card { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+  .leg-card.focused { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+  .step-num {
+    flex: none; width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 800; margin-top: 0.1rem;
+  }
+  .step-num.walk { background: #f3f4f6; color: #4b5563; border: 2px solid var(--walk); }
+  .step-num.ride { background: #dbeafe; color: var(--blue); border: 2px solid var(--blue); }
+  .leg-fare-tag {
+    margin-left: auto; flex: none; font-size: 0.8rem; font-weight: 700;
+    color: var(--accent); background: var(--accent-light);
+    padding: 0.15rem 0.5rem; border-radius: 999px; white-space: nowrap;
+  }
+  .leg-fare-tag.free { color: var(--muted); background: var(--bg); }
+
+  /* ---- route map card ---- */
+  .map-card { background: var(--card); border: 2px solid var(--border-light); border-radius: var(--radius); overflow: hidden; margin-top: 1.25rem; }
+  .map-head { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.875rem; border-bottom: 1px solid var(--border-light); }
+  .map-head .t { font-size: 0.8rem; font-weight: 700; }
+  .new-pill { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em; background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; padding: 0.15rem 0.5rem; border-radius: 999px; }
+  #cg-map { height: 340px; width: 100%; background: #e8e6df; }
+  .map-legend { display: flex; gap: 0.9rem; padding: 0.55rem 0.875rem; border-top: 1px solid var(--border-light); font-size: 0.72rem; color: var(--muted); align-items: center; flex-wrap: wrap; }
+  .lg-item { display: flex; align-items: center; gap: 0.35rem; }
+  .lg-line { width: 22px; height: 0; border-top: 3px solid var(--blue); border-radius: 2px; }
+  .lg-line.walk { border-top: 2px dashed var(--walk); }
+  .map-hint { font-size: 0.68rem; color: var(--muted); padding: 0 0.875rem 0.55rem; font-style: italic; }
+
+  /* ---- Leaflet divIcon markers ---- */
+  .pin { display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50% 50% 50% 0; transform: rotate(-45deg); border:2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+  .pin span { transform: rotate(45deg); color:#fff; font-size:11px; font-weight:700; }
+  .stepbadge { display:flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:#fff; font-size:11px; font-weight:800; box-shadow:0 1px 4px rgba(0,0,0,.35); border:2px solid; }
+  .stopdot { width:9px; height:9px; background:var(--blue); border:2px solid #fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+  .leaflet-control-attribution { font-size: 8px !important; }
+
   .option-notes {
     margin-top: 0.4rem;
     font-size: 0.72rem;
@@ -621,6 +661,8 @@
 
     <button class="cg-plan-btn" id="cg-plan-btn" disabled>Plan Trip</button>
   </section>
+
+  <div id="cg-map-wrap"></div>
 
   <section class="section">
     <div class="label">Route options</div>
@@ -1013,6 +1055,7 @@
     cgSearchBtn.disabled = true;
     cgSearchBtn.textContent = "Searching\u2026";
     cgResults.innerHTML = "";
+    teardownMap();
     selectedOrigin = null;
     selectedDest = null;
     updatePlanBtn();
@@ -1092,19 +1135,23 @@
           lastPlanOptions = data.options;
           lastRouteFreshness = data.route_freshness || {};
           renderPlanResults(data.options, lastRouteFreshness);
+          renderMap(data.options);
           renderFeedbackPrompt(data.options);
           fetchCommunityStrip();
         } else if (data.status === "no_route") {
+          teardownMap();
           cgResults.innerHTML =
             '<div class="mode-unavailable">No direct route found between these points yet. Try points closer to Mandaluyong routes or the MRT-3 line.</div>';
           cgFeedbackPrompt.innerHTML = "";
         } else {
+          teardownMap();
           cgResults.innerHTML = '<div class="mode-unavailable">' + escHtml(data.message || "Something went wrong planning your trip.") + '</div>';
           cgFeedbackPrompt.innerHTML = "";
         }
       })
       .catch(function () {
         cgPlanBtn.disabled = false;
+        teardownMap();
         cgResults.innerHTML = '<div class="mode-unavailable">Network error while planning. Please check your connection and try again.</div>';
         cgFeedbackPrompt.innerHTML = "";
       });
@@ -1178,14 +1225,23 @@
       h += getChipHtml(routeFreshness, opt.legs);
       h += '</div>';
 
+      var stepNum = 0;
       if (opt.legs) {
         opt.legs.forEach(function (leg) {
-          h += '<div class="leg-card">';
+          stepNum++;
           if (leg.type === "walk") {
             var meters = Math.round(leg.distance_m);
-            h += '<span class="leg-mode">Walk</span> ' + meters + ' m';
+            var segKey = stepNum === 1 ? "walk1" : "walk2";
+            h += '<div class="leg-card" data-seg="' + segKey + '">';
+            h += '<div class="step-num walk">' + stepNum + '</div>';
+            h += '<div class="leg-body" style="flex:1;min-width:0;"><span class="leg-mode">Walk</span> ' + meters + ' m</div>';
+            h += '<div class="leg-fare-tag free">free</div>';
+            h += '</div>';
           } else if (leg.type === "ride") {
             var modeLabel = MODE_LABELS[leg.mode] || leg.mode;
+            h += '<div class="leg-card" data-seg="ride">';
+            h += '<div class="step-num ride">' + stepNum + '</div>';
+            h += '<div class="leg-body" style="flex:1;min-width:0;">';
             h += '<span class="leg-mode">' + escHtml(modeLabel) + '</span>';
             h += '<div class="leg-detail">' +
               escHtml(leg.route_long_name || "") + '<br>' +
@@ -1193,9 +1249,10 @@
               ' &rarr; ' +
               escHtml(leg.alight_stop ? leg.alight_stop.stop_name : "") +
               ' &middot; ' + leg.distance_km.toFixed(1) + ' km' +
-              '</div>';
+              '</div></div>';
+            h += '<div class="leg-fare-tag">\u20b1' + formatFare(fare) + '</div>';
+            h += '</div>';
           }
-          h += '</div>';
         });
       }
 
@@ -1252,6 +1309,185 @@
         }
       });
     }
+  }
+
+  /* ================================================================
+     ROUTE MAP (Leaflet)
+     ================================================================ */
+
+  var cgMapWrap = document.getElementById("cg-map-wrap");
+  var cgMap = null;
+  var cgMapSegments = null;
+  var cgMapAllGroup = null;
+
+  function teardownMap() {
+    if (cgMap) { cgMap.remove(); cgMap = null; }
+    cgMapSegments = null;
+    cgMapAllGroup = null;
+    cgMapWrap.innerHTML = "";
+  }
+
+  function renderMap(options) {
+    teardownMap();
+    if (!options || !options.length || !window.L) return;
+
+    var minFare = Infinity;
+    options.forEach(function (o) {
+      var f = typeof o.total_fare === "number" ? o.total_fare : parseFloat(o.total_fare);
+      if (f < minFare) minFare = f;
+    });
+    var cheapest = null;
+    for (var ci = 0; ci < options.length; ci++) {
+      var cf = typeof options[ci].total_fare === "number" ? options[ci].total_fare : parseFloat(options[ci].total_fare);
+      if (cf === minFare) { cheapest = options[ci]; break; }
+    }
+    if (!cheapest || !cheapest.legs || cheapest.legs.length < 2) return;
+
+    var legs = cheapest.legs;
+    var originPt = null;
+    var destPt = null;
+    var walkPolylines = [];
+    var ridePolyline = null;
+
+    legs.forEach(function (leg) {
+      if (leg.type === "walk" && leg.from && leg.to) {
+        if (!originPt) originPt = [leg.from.lat, leg.from.lon];
+        destPt = [leg.to.lat, leg.to.lon];
+        walkPolylines.push(L.polyline(
+          [[leg.from.lat, leg.from.lon], [leg.to.lat, leg.to.lon]],
+          {color: "#9ca3af", weight: 3, dashArray: "6 8", opacity: 0.9}
+        ));
+      } else if (leg.type === "ride") {
+        var shape = leg.shape;
+        if (!shape || shape.length < 2) {
+          shape = [[leg.board_stop.lat, leg.board_stop.lon],
+                   [leg.alight_stop.lat, leg.alight_stop.lon]];
+        }
+        ridePolyline = L.polyline(shape, {color: "#2563eb", weight: 4, opacity: 0.9});
+      }
+    });
+
+    if (!originPt || !destPt || !ridePolyline) return;
+
+    cgMapWrap.innerHTML =
+      '<div class="map-card">' +
+        '<div class="map-head"><span class="t">Route map \u2014 cheapest option</span><span class="new-pill">NEW \u00b7 TIER 1</span></div>' +
+        '<div id="cg-map"></div>' +
+        '<div class="map-legend">' +
+          '<span class="lg-item"><span class="lg-line walk"></span> Walk</span>' +
+          '<span class="lg-item"><span class="lg-line"></span> Jeepney ride</span>' +
+          '<span class="lg-item">\u2460 \u2461 \u2462 = your steps</span>' +
+        '</div>' +
+        '<div class="map-hint">Tap a step below to highlight it on the map</div>' +
+      '</div>';
+
+    var mapEl = document.getElementById("cg-map");
+    if (!mapEl) return;
+
+    cgMap = L.map(mapEl, {zoomControl: true, scrollWheelZoom: false});
+    L.tileLayer("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap &copy; CARTO", maxZoom: 19
+    }).addTo(cgMap);
+
+    function asPair(p) { return Array.isArray(p) ? p : [p.lat, p.lng]; }
+    function alongPt(a, b, t) {
+      a = asPair(a); b = asPair(b);
+      return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t];
+    }
+
+    function pinHtml(color, label) {
+      return '<div class="pin" style="background:'+color+'"><span>'+label+'</span></div>';
+    }
+    function badgeHtml(n, kind) {
+      var c = kind === "ride" ? "#2563eb" : "#6b7280";
+      return '<div class="stepbadge" style="color:'+c+';border-color:'+c+'">'+n+'</div>';
+    }
+    var stopIcon = L.divIcon({className:"", html:'<div class="stopdot"></div>', iconSize:[9,9], iconAnchor:[4,4]});
+
+    var segs = {};
+    var allPolylines = [];
+
+    walkPolylines.forEach(function (wl, wi) {
+      var key = wi === 0 ? "walk1" : "walk2";
+      segs[key] = wl.addTo(cgMap);
+      allPolylines.push(wl);
+    });
+    segs.ride = ridePolyline.addTo(cgMap);
+    allPolylines.push(ridePolyline);
+
+    var rideShape = ridePolyline.getLatLngs();
+    var rideCoords = rideShape.map(function (ll) { return Array.isArray(ll) ? ll : [ll.lat, ll.lng]; });
+
+    L.marker(alongPt(originPt, segs.walk1.getLatLngs()[1], 0.6),
+      {icon: L.divIcon({className:"", html:badgeHtml(1,"walk"), iconSize:[22,22], iconAnchor:[11,11]}), zIndexOffset: 600}
+    ).addTo(cgMap);
+
+    if (rideCoords.length >= 4) {
+      L.marker(alongPt(rideCoords[2], rideCoords[3], 0.5),
+        {icon: L.divIcon({className:"", html:badgeHtml(2,"ride"), iconSize:[22,22], iconAnchor:[11,11]}), zIndexOffset: 600}
+      ).addTo(cgMap);
+    } else if (rideCoords.length >= 2) {
+      L.marker(alongPt(rideCoords[0], rideCoords[rideCoords.length-1], 0.5),
+        {icon: L.divIcon({className:"", html:badgeHtml(2,"ride"), iconSize:[22,22], iconAnchor:[11,11]}), zIndexOffset: 600}
+      ).addTo(cgMap);
+    }
+
+    if (walkPolylines.length >= 2) {
+      var w2ll = segs.walk2.getLatLngs();
+      var w2From = w2ll[0];
+      L.marker(alongPt([w2From.lat, w2From.lng], destPt, 0.3),
+        {icon: L.divIcon({className:"", html:badgeHtml(3,"walk"), iconSize:[22,22], iconAnchor:[11,11]}), zIndexOffset: 600}
+      ).addTo(cgMap);
+    }
+
+    var midRide = rideCoords;
+    if (midRide.length >= 3) {
+      midRide.slice(1, -1).forEach(function (p) {
+        L.marker(p, {icon: stopIcon, interactive: false}).addTo(cgMap);
+      });
+    }
+
+    L.marker(originPt, {
+      icon: L.divIcon({className:"", html:pinHtml("#16a34a","A"), iconSize:[26,26], iconAnchor:[13,26]}),
+      zIndexOffset: 500
+    }).addTo(cgMap).bindTooltip("You start here", {direction: "right"});
+
+    L.marker(destPt, {
+      icon: L.divIcon({className:"", html:pinHtml("#dc2626","B"), iconSize:[26,26], iconAnchor:[13,26]}),
+      zIndexOffset: 500
+    }).addTo(cgMap).bindTooltip("Destination", {direction: "right"});
+
+    cgMapSegments = segs;
+    cgMapAllGroup = L.featureGroup(allPolylines);
+    cgMap.fitBounds(cgMapAllGroup.getBounds().pad(0.18));
+
+    function focusSeg(key) {
+      for (var k in segs) {
+        var on = (k === key);
+        segs[k].setStyle({opacity: on ? 1 : 0.4, weight: on ? 6 : (k === "ride" ? 4 : 3)});
+      }
+      document.querySelectorAll(".option-card.cheapest-opt .leg-card").forEach(function (el) {
+        el.classList.toggle("focused", el.getAttribute("data-seg") === key);
+      });
+      cgMap.fitBounds(segs[key].getBounds(), {padding: [35,35], animate: false, maxZoom: 17});
+    }
+
+    function resetMap() {
+      if (segs.walk1) segs.walk1.setStyle({opacity: 0.9, weight: 3});
+      if (segs.walk2) segs.walk2.setStyle({opacity: 0.9, weight: 3});
+      segs.ride.setStyle({opacity: 0.9, weight: 4});
+      document.querySelectorAll(".option-card.cheapest-opt .leg-card").forEach(function (el) {
+        el.classList.remove("focused");
+      });
+      cgMap.fitBounds(cgMapAllGroup.getBounds().pad(0.18), {animate: false});
+    }
+
+    document.querySelectorAll(".option-card.cheapest-opt .leg-card").forEach(function (el) {
+      el.addEventListener("click", function () {
+        if (el.classList.contains("focused")) resetMap();
+        else focusSeg(el.getAttribute("data-seg"));
+      });
+    });
   }
 
   /* ================================================================
