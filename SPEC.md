@@ -223,7 +223,85 @@ Commuter simulation with real trips (Mandaluyong City Hall → Ortigas; Shaw →
 Boni; one out-of-coverage destination → friendly handling), then merge to
 main + push to the existing GitHub repo + Telegram notify.
 
-### 8. README.md
+### 8. Epic E7: Community Data Flywheel (Level 1)
+
+**Goal:** every trip search becomes a data-quality event. The pilot's 2017-vintage
+routes get fresher WHERE PEOPLE WALK — confirmations, disputes, and corrections
+collected in the moment of use, visible to the next commuter.
+
+**Core loop:** search → see freshness → confirm/dispute → next commuter sees
+better data → more trust → more searches → more signal.
+
+**Scope decisions (binding):**
+- Intake channel for E7 = in-app web UI ONLY. Telegram bot intake is deferred
+  (backlog card, future E8).
+- Recognition = lightweight v1: contribution counts + "Route Steward" label
+  for the top confirmer per corridor. No full leaderboard, no accounts.
+- Corrections are NEVER auto-applied to the dataset. They are stored,
+  surfaced, and ranked with — human/swarm review promotes them later.
+
+#### S7.1 — Feedback data layer + freshness engine
+- `data/community_updates.jsonl` — append-only ledger, one JSON object per
+  line: `{ts (ISO), route_id, kind: confirm|dispute|note, alias? (free text,
+  optional), note? (kind=note), fingerprint}`. Malformed lines are skipped
+  with a warning, never crash the loader.
+- `guide/feedback.py`:
+  - `append_feedback(route_id, kind, alias=None, note=None, fingerprint=...)`
+  - `load_feedback()` → list of records
+  - `freshness(route_id)` → `{tier, confirmations, disputes, last_confirmed,
+    stewards}` with tiers:
+    - `green`: ≥3 confirmations within 30 days, disputes ≤ confirmations
+    - `yellow`: ≥1 confirmation within 90 days
+    - `disputed`: disputes > confirmations within 30 days
+    - `gray`: never confirmed (the 2017-feed default)
+  - Dedupe: same route + fingerprint + kind within the same calendar day
+    counts once.
+- Privacy: alias is optional free text; docstring states aliases are public
+  and no other PII is collected.
+- Tests: freshness tier math, dedupe, malformed-line tolerance, steward
+  attribution (most confirmations on a route = steward). No live network.
+
+AC: (1) full suite green incl. pre-existing; (2) tier thresholds exactly as
+specified (unit tests on synthetic clock values); (3) dedupe works; (4) no
+network in tests.
+
+#### S7.2 — Feedback API + UI v3 (freshness chips + post-search prompt)
+- `web/server.py` additions (all prior endpoints intact):
+  - `POST /api/feedback` body `{route_id, kind, alias?, note?}` → 200
+    `{ok: true, freshness: {...}}`; invalid kind / missing route_id → friendly
+    JSON 400.
+  - `GET /api/freshness?route_id=...` → freshness JSON; unknown route → gray
+    defaults (NOT an error).
+  - `/api/plan` responses gain a `route_freshness` map (route_id → tier +
+    counts) for every ride leg.
+- Planner integration: options sort cheapest-first as today, BUT disputed
+  routes sort below non-disputed options at equal total fare.
+- `web/index.html` v3:
+  - Freshness chip on every Commute Guide option, color-coded:
+    green "Verified by N commuters · Xd ago", yellow "Recently confirmed",
+    gray "Unverified (2017 data)", disputed "⚠ Reported issues".
+  - Post-search prompt below results: "Help the next commuter — did this
+    route actually run today?" → tap an option → 👍 Still runs / 👎 Gone or
+    changed / ✏️ Quick note → POST /api/feedback → toast "Salamat! Your report
+    helps future commuters." Alias prompted once, remembered via localStorage.
+  - Community strip (bottom of Commute Guide tab): total reports, top Route
+    Stewards by corridor (alias + count).
+  - Fare Calculator tab preserved verbatim (regression: 7.5 km traditional
+    = 18.30).
+- Mobile-first 375px, no npm, no maps.
+
+AC: (1) POST round-trip works and jsonl gains exactly one line; (2) duplicate
+same-day same-fingerprint confirm counted once; (3) freshness chips render
+per tier; (4) disputed option sinks below equal-fare clean option; (5)
+calculator regression intact; (6) suite green; (7) no npm artifacts.
+
+#### E7 Gate
+Commuter simulation: plan Shaw→Boni → all chips gray → submit confirmations
+(≥3 distinct fingerprints) + one dispute via API/UI → re-plan → chips update,
+disputed option sinks → jsonl is append-only and parseable. Then merge to
+main, push to GitHub, Telegram notify.
+
+### 9. README.md
 
 What this is, the pilot scope, the data availability table above, how to
 use the library, how to contribute fare updates (PR with source citation),
