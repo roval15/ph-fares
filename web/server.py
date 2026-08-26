@@ -31,6 +31,7 @@ guide_geocode = importlib.import_module("guide.geocode")  # noqa: E402
 import guide.planner as guide_planner  # noqa: E402
 import guide.feedback as guide_feedback  # noqa: E402
 import guide.pois as guide_pois  # noqa: E402
+import guide.tracker as guide_tracker  # noqa: E402
 from guide.feedback import (
     _dedupe_records,
     _calendar_day,
@@ -39,11 +40,16 @@ from guide.feedback import (
 )  # noqa: E402
 
 _HTML_PATH = Path(__file__).resolve().parent / "index.html"
+_TRACKING_JS_PATH = Path(__file__).resolve().parent / "tracking-core.js"
 
 HOST = os.environ.get("HOST", "127.0.0.1")
 PORT = int(os.environ.get("PORT", "8330"))
 
 DISTANCE_MODES = ["jeepney_traditional", "jeepney_modern"]
+
+
+class _BodyError(Exception):
+    """Raised when a POST body cannot be parsed (caught in handlers)."""
 
 
 def _json_default(obj):
@@ -59,6 +65,8 @@ class FareHandler(BaseHTTPRequestHandler):
 
         if path == "/":
             self._serve_index()
+        elif path == "/tracking-core.js":
+            self._serve_tracking_js()
         elif path == "/api/fare":
             self._serve_fare(parsed.query)
         elif path == "/api/geocode":
@@ -71,6 +79,10 @@ class FareHandler(BaseHTTPRequestHandler):
             self._serve_community()
         elif path == "/api/pois":
             self._serve_pois(parsed.query)
+        elif path == "/api/config":
+            self._serve_config()
+        elif path == "/api/trips":
+            self._serve_trips(parsed.query)
         else:
             self._send_json(404, {"error": "Not found"})
 
@@ -80,6 +92,12 @@ class FareHandler(BaseHTTPRequestHandler):
 
         if path == "/api/feedback":
             self._serve_feedback_post()
+        elif path == "/api/track/start":
+            self._serve_track_start()
+        elif path == "/api/track/point":
+            self._serve_track_point()
+        elif path == "/api/track/stop":
+            self._serve_track_stop()
         else:
             self._send_json(404, {"error": "Not found"})
 
@@ -91,6 +109,13 @@ class FareHandler(BaseHTTPRequestHandler):
             self._send_response(200, "text/html; charset=utf-8", html.encode())
         except FileNotFoundError:
             self._send_json(500, {"error": "index.html not found"})
+
+    def _serve_tracking_js(self):
+        try:
+            js = _TRACKING_JS_PATH.read_text(encoding="utf-8")
+            self._send_response(200, "application/javascript; charset=utf-8", js.encode())
+        except FileNotFoundError:
+            self._send_json(404, {"error": "tracking-core.js not found"})
 
     def _serve_fare(self, query_string: str):
         params = parse_qs(query_string)
@@ -392,6 +417,129 @@ class FareHandler(BaseHTTPRequestHandler):
 
         self._send_json(200, {"status": "ok", "pois": pois})
 
+    # -- config / tracking ------------------------------------------------
+
+    def _serve_config(self):
+        self._send_json(200, {"tracking_enabled": guide_tracker.is_enabled()})
+
+    def _serve_trips(self, query_string: str):
+        params = parse_qs(query_string)
+        limit_raw = params.get("limit", ["5"])[0]
+        try:
+            limit = int(limit_raw)
+        except (ValueError, TypeError):
+            limit = 5
+        limit = max(1, min(50, limit))
+        trips = guide_tracker.list_trips(limit=limit)
+        self._send_json(200, {"trips": trips})
+
+    def _check_tracking_enabled(self) -> bool:
+        """Return True if tracking is enabled; otherwise send 503 and return False."""
+        if not guide_tracker.is_enabled():
+            self._send_json(503, {"error": "tracking not available"})
+            return False
+        return True
+
+    def _serve_track_start(self):
+        if not self._check_tracking_enabled():
+            return
+        try:
+            body = self._read_json_body()
+        except _BodyError as exc:
+            self._send_json(400, {"error": str(exc)})
+            return
+        alias = None
+        if isinstance(body, dict):
+            alias = body.get("alias") or None
+        result = guide_tracker.start_trip(alias=alias)
+        self._send_json(200, result)
+
+    def _serve_track_point(self):
+        if not self._check_tracking_enabled():
+            return
+        try:
+            body = self._read_json_body()
+        except _BodyError as exc:
+            self._send_json(400, {"error": str(exc)})
+            return
+        if not isinstance(body, dict):
+            self._send_json(400, {"error": "Request body must be a JSON object."})
+            return
+
+        trip_id = body.get("trip_id")
+        if not trip_id or not isinstance(trip_id, str):
+            self._send_json(400, {"error": "Missing or invalid trip_id."})
+            return
+
+        err = guide_tracker._validate_point(body)
+        if err:
+            self._send_json(400, {"error": err})
+            return
+
+        try:
+            guide_tracker.add_point(
+                trip_id,
+                float(body["lat"]),
+                float(body["lon"]),
+                float(body["ts"]),
+                float(body["accuracy"]),
+            )
+        except KeyError:
+            self._send_json(404, {"error": "Unknown trip_id."})
+            return
+        except RuntimeError as exc:
+            self._send_json(409, {"error": str(exc)})
+            return
+
+        self._send_json(200, {"ok": True})
+
+    def _serve_track_stop(self):
+        if not self._check_tracking_enabled():
+            return
+        try:
+            body = self._read_json_body()
+        except _BodyError as exc:
+            self._send_json(400, {"error": str(exc)})
+            return
+        if not isinstance(body, dict):
+            self._send_json(400, {"error": "Request body must be a JSON object."})
+            return
+
+        trip_id = body.get("trip_id")
+        if not trip_id or not isinstance(trip_id, str):
+            self._send_json(400, {"error": "Missing or invalid trip_id."})
+            return
+
+        alias = body.get("alias") or None
+
+        try:
+            summary = guide_tracker.stop_trip(trip_id, alias=alias)
+        except KeyError:
+            self._send_json(404, {"error": "Unknown trip_id."})
+            return
+
+        self._send_json(200, summary)
+
+    def _read_json_body(self) -> dict | list | None:
+        """Read and parse a JSON body.  Raises _BodyError on failure."""
+        content_length_raw = self.headers.get("Content-Length")
+        if content_length_raw is None:
+            raise _BodyError("Missing Content-Length header.")
+        try:
+            content_length = int(content_length_raw)
+        except (ValueError, TypeError):
+            raise _BodyError("Invalid Content-Length.")
+        if content_length > 10240:
+            raise _BodyError("Request body too large (max 10 KB).")
+        try:
+            body_bytes = self.rfile.read(content_length)
+        except Exception:
+            raise _BodyError("Failed to read request body.")
+        try:
+            return json.loads(body_bytes)
+        except (json.JSONDecodeError, ValueError):
+            raise _BodyError("Invalid JSON in request body.")
+
     def _send_json(self, code: int, body: dict):
         payload = json.dumps(body, ensure_ascii=False, default=_json_default).encode("utf-8")
         self._send_response(code, "application/json; charset=utf-8", payload)
@@ -404,7 +552,9 @@ class FareHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def log_message(self, fmt, *args):
-        # Keep logs minimal
+        # Suppress IP logging for tracking endpoints (privacy)
+        if hasattr(self, "path") and self.path.startswith("/api/track"):
+            return
         sys.stderr.write(f"[{self.log_date_time_string()}] {fmt % args}\n")
 
 

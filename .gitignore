@@ -2,3 +2,4 @@
 data/geocode_cache.json
 data/community_updates.jsonl
 data/poi_cache.json
+data/trips/
