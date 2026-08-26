@@ -50,6 +50,23 @@ def _mrt3_discount_note() -> str:
     return modes.get("mrt3", {}).get("notes", "")
 
 
+def _sort_options(options: list[dict], tier_of) -> None:
+    """Sort cheapest-first; among EQUAL total fares, options whose ride legs
+    include any disputed-tier route sink below others.
+    Stable: never reorders otherwise."""
+    def _disputed(opt):
+        for leg in opt["legs"]:
+            if leg["type"] == "ride":
+                rid = leg.get("route_id")
+                if rid is not None and tier_of(rid) == "disputed":
+                    return True
+        return False
+
+    options.sort(
+        key=lambda o: (o["total_fare"], 1 if _disputed(o) else 0)
+    )
+
+
 def plan(
     from_lat: float,
     from_lon: float,
@@ -196,18 +213,11 @@ def plan(
         except Exception:
             _freshness_cache[rid] = {"tier": "gray"}
 
-    def _option_is_disputed(opt: dict) -> bool:
-        for leg in opt["legs"]:
-            if leg["type"] == "ride":
-                f = _freshness_cache.get(leg.get("route_id"), {})
-                if f.get("tier") == "disputed":
-                    return True
-        return False
+    def _tier_of(route_id: str) -> str | None:
+        return _freshness_cache.get(route_id, {}).get("tier")
 
     # Sort cheapest first; among equal fares, disputed options sink
-    options.sort(
-        key=lambda o: (o["total_fare"], 0 if _option_is_disputed(o) else 1)
-    )
+    _sort_options(options, _tier_of)
 
     if not options:
         return {

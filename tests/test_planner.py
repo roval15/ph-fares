@@ -159,49 +159,58 @@ class TestPlanNoRoute:
         assert "to" in result
 
 
-class TestDisputedSinkSort:
-    """Disputed options sink below equal-fare clean options; cheapest-first preserved for different fares."""
+class TestSortOptions:
+    """Direct unit tests for _sort_options — no planner data dependency."""
 
-    def test_disputed_sinks_below_equal_fare_clean(self, monkeypatch):
+    def _make_option(self, route_id: str, fare: Decimal) -> dict:
+        return {
+            "legs": [{"type": "ride", "route_id": route_id}],
+            "fare_breakdown": {},
+            "total_fare": fare,
+            "notes": [],
+        }
+
+    def test_disputed_sinks_below_equal_fare_clean(self):
+        clean = self._make_option("CLEAN_R", Decimal("15"))
+        disputed = self._make_option("DIRTY_R", Decimal("15"))
+        tiers = {"CLEAN_R": "green", "DIRTY_R": "disputed"}
+
+        opts = [disputed, clean]
+        planner_mod._sort_options(opts, lambda r: tiers.get(r))
+        assert opts[0] is clean
+        assert opts[1] is disputed
+
+        # Reverse input order → same output (proves it re-orders, not just preserves)
+        opts2 = [clean, disputed]
+        planner_mod._sort_options(opts2, lambda r: tiers.get(r))
+        assert opts2[0] is clean
+        assert opts2[1] is disputed
+
+    def test_cheaper_disputed_stays_above_pricier_clean(self):
+        disputed = self._make_option("DIRTY_R", Decimal("12"))
+        clean = self._make_option("CLEAN_R", Decimal("15"))
+        tiers = {"CLEAN_R": "green", "DIRTY_R": "disputed"}
+
+        opts = [clean, disputed]
+        planner_mod._sort_options(opts, lambda r: tiers.get(r))
+        assert opts[0] is disputed
+        assert opts[1] is clean
+
+    def test_no_freshness_info_defaults_to_clean_treatment(self):
+        a = self._make_option("R_A", Decimal("15"))
+        b = self._make_option("R_B", Decimal("15"))
+        opts = [a, b]
+        planner_mod._sort_options(opts, lambda r: None)
+        assert opts == [a, b]
+
+
+class TestDisputedSinkIntegration:
+    """Thin integration: plan() with all-gray freshness produces sorted fares."""
+
+    def test_plan_fares_are_sorted(self, monkeypatch):
         _patch_all(monkeypatch)
-        # Monkeypatch freshness so R_DIRTY is disputed, R_CLEAN is green
-        def fake_freshness(route_id):
-            if route_id == "R_DIRTY":
-                return {"tier": "disputed", "confirmations": 0, "disputes": 3}
-            return {"tier": "green", "confirmations": 5, "disputes": 0}
-
-        monkeypatch.setattr(planner_mod, "_freshness", fake_freshness)
-
-        result = planner_mod.plan(14.5705, 121.040, 14.5795, 121.050)
-        assert result["status"] == "ok"
-
-        # If there are options with equal fare, the clean one should come first
-        # Build (fare, is_disputed) list
-        from itertools import groupby
-        fare_groups = []
-        for opt in result["options"]:
-            fare = opt["total_fare"]
-            has_disputed = any(
-                l.get("type") == "ride" and l.get("route_id") == "R_DIRTY"
-                for l in opt["legs"]
-            )
-            fare_groups.append((fare, has_disputed))
-
-        # Group by fare to check disputed sinks within each fare group
-        for fare, group in groupby(fare_groups, key=lambda x: x[0]):
-            group_list = list(group)
-            disputed_positions = [i for i, (_, d) in enumerate(group_list) if d]
-            clean_positions = [i for i, (_, d) in enumerate(group_list) if not d]
-            if disputed_positions and clean_positions:
-                assert max(disputed_positions) > min(clean_positions), \
-                    f"Disputed option should be after clean option for fare {fare}"
-
-    def test_cheapest_first_preserved_for_different_fares(self, monkeypatch):
-        _patch_all(monkeypatch)
-        def fake_freshness(route_id):
-            return {"tier": "gray", "confirmations": 0, "disputes": 0}
-        monkeypatch.setattr(planner_mod, "_freshness", fake_freshness)
-
+        monkeypatch.setattr(planner_mod, "_freshness",
+                           lambda rid: {"tier": "gray", "confirmations": 0, "disputes": 0})
         result = planner_mod.plan(14.5705, 121.040, 14.5795, 121.050)
         assert result["status"] == "ok"
         fares = [o["total_fare"] for o in result["options"]]
