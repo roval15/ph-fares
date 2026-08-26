@@ -1389,7 +1389,11 @@
       attribution: "&copy; OpenStreetMap &copy; CARTO", maxZoom: 19
     }).addTo(cgMap);
 
-    function alongPt(a, b, t) { return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]; }
+    function asPair(p) { return Array.isArray(p) ? p : [p.lat, p.lng]; }
+    function alongPt(a, b, t) {
+      a = asPair(a); b = asPair(b);
+      return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t];
+    }
 
     function pinHtml(color, label) {
       return '<div class="pin" style="background:'+color+'"><span>'+label+'</span></div>';
@@ -1436,8 +1440,8 @@
       ).addTo(cgMap);
     }
 
-    var midRide = rideCoords.length >= 4 ? rideCoords.slice(2, 4) : rideCoords;
-    if (midRide.length >= 2) {
+    var midRide = rideCoords;
+    if (midRide.length >= 3) {
       midRide.slice(1, -1).forEach(function (p) {
         L.marker(p, {icon: stopIcon, interactive: false}).addTo(cgMap);
       });
