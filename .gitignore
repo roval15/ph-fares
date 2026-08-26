@@ -1,12 +1,4 @@
-# Python
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.venv/
-
-# Tooling / orchestration
-.worktrees/
-
 # Runtime artifacts
 data/geocode_cache.json
 data/community_updates.jsonl
+data/poi_cache.json
