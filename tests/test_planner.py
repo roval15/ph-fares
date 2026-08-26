@@ -83,6 +83,7 @@ def _patch_all(monkeypatch):
     """Patch both finder and planner data loaders."""
     finder_mod._build_stop_index.cache_clear()
     monkeypatch.setattr(finder_mod, "_load_sequences", lambda: _FIXTURE_SEQUENCES)
+    monkeypatch.setattr(planner_mod, "_load_sequences", lambda: _FIXTURE_SEQUENCES)
     monkeypatch.setattr(finder_mod, "_load_mrt3", lambda: _MRT3_FIXTURE)
     # planner imports _load_mrt3 from finder — patch the local binding too
     monkeypatch.setattr(planner_mod, "_load_mrt3", lambda: _MRT3_FIXTURE)
