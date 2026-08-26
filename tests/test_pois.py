@@ -301,6 +301,37 @@ class TestCacheZeroHttp:
 
 
 # ---------------------------------------------------------------------------
+# Tests: cache poisoning prevention (E9/S9.1)
+# ---------------------------------------------------------------------------
+
+class TestCachePoisoning:
+    def test_failed_fetch_not_cached(self, monkeypatch):
+        """Total Overpass failure must NOT write to cache."""
+        mock_fn, _ = _mock_urlopen_factory(exc=OSError("all mirrors down"))
+        monkeypatch.setattr(pois_mod, "_urlopen", mock_fn)
+        monkeypatch.setattr(pois_mod, "OVERPASS_MIRRORS", ["https://mirror1.test", "https://mirror2.test"])
+
+        results = pois_mod.nearby_pois(SHAW_LAT, SHAW_LON, radius_m=250, limit=5)
+        # MRT results still returned
+        mrt = [r for r in results if r["source"] == "mrt"]
+        assert len(mrt) >= 1
+        # Cache key must NOT be present
+        key = pois_mod._cache_key(SHAW_LAT, SHAW_LON, 250)
+        assert key not in pois_mod._load_cache()
+
+    def test_success_but_empty_is_cached(self, monkeypatch):
+        """A legitimate empty Overpass response should be cached."""
+        mock_fn, _ = _mock_urlopen_factory(_overpass_response([]))
+        monkeypatch.setattr(pois_mod, "_urlopen", mock_fn)
+
+        pois_mod.nearby_pois(SHAW_LAT, SHAW_LON, radius_m=250, limit=5)
+        key = pois_mod._cache_key(SHAW_LAT, SHAW_LON, 250)
+        cache = pois_mod._load_cache()
+        assert key in cache
+        assert cache[key] == []
+
+
+# ---------------------------------------------------------------------------
 # Tests: graceful degradation — various Overpass failures
 # ---------------------------------------------------------------------------
 
