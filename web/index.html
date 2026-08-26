@@ -351,6 +351,36 @@
     font-style: italic;
   }
 
+  .ties-summary {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    padding: 0.35rem 0.55rem;
+    background: var(--green-bg);
+    border: 1px solid var(--green);
+    border-radius: var(--radius);
+  }
+
+  .show-more-btn {
+    display: block;
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.25rem;
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .show-more-btn:hover {
+    border-color: var(--accent);
+    background: var(--bg);
+  }
+
   /* ---- footer ---- */
   footer {
     margin-top: 2rem;
@@ -818,28 +848,37 @@
       if (f < minFare) minFare = f;
     });
 
-    var html = "";
-    options.forEach(function (opt) {
+    var tieCount = 0;
+    options.forEach(function (o) {
+      var f = typeof o.total_fare === "number" ? o.total_fare : parseFloat(o.total_fare);
+      if (f === minFare) tieCount++;
+    });
+
+    var badgedCount = 0;
+    var badgedLimit = options.length > 1 ? Math.min(tieCount, 3) : 0;
+
+    function buildCard(opt, idx) {
       var fare = typeof opt.total_fare === "number" ? opt.total_fare : parseFloat(opt.total_fare);
-      var cheapest = fare === minFare && options.length > 1;
+      var cheapest = badgedCount < badgedLimit && fare === minFare;
+      if (cheapest) badgedCount++;
       var cardCls = "option-card" + (cheapest ? " cheapest-opt" : "");
       var badge = cheapest ? '<span class="cheapest-badge">Cheapest</span>' : "";
 
-      html += '<div class="' + cardCls + '">';
-      html += '<div class="option-header">';
-      html += '<div class="option-total">\u20b1' + formatFare(fare) + badge + '</div>';
-      html += '</div>';
+      var h = '<div class="' + cardCls + '">';
+      h += '<div class="option-header">';
+      h += '<div class="option-total">\u20b1' + formatFare(fare) + badge + '</div>';
+      h += '</div>';
 
       if (opt.legs) {
         opt.legs.forEach(function (leg) {
-          html += '<div class="leg-card">';
+          h += '<div class="leg-card">';
           if (leg.type === "walk") {
             var meters = Math.round(leg.distance_m);
-            html += '<span class="leg-mode">Walk</span> ' + meters + ' m';
+            h += '<span class="leg-mode">Walk</span> ' + meters + ' m';
           } else if (leg.type === "ride") {
             var modeLabel = MODE_LABELS[leg.mode] || leg.mode;
-            html += '<span class="leg-mode">' + escHtml(modeLabel) + '</span>';
-            html += '<div class="leg-detail">' +
+            h += '<span class="leg-mode">' + escHtml(modeLabel) + '</span>';
+            h += '<div class="leg-detail">' +
               escHtml(leg.route_long_name || "") + '<br>' +
               escHtml(leg.board_stop ? leg.board_stop.stop_name : "") +
               ' &rarr; ' +
@@ -847,20 +886,63 @@
               ' &middot; ' + leg.distance_km.toFixed(1) + ' km' +
               '</div>';
           }
-          html += '</div>';
+          h += '</div>';
         });
       }
 
       if (opt.notes && opt.notes.length > 0) {
         opt.notes.forEach(function (n) {
-          html += '<div class="option-notes">' + escHtml(n) + '</div>';
+          h += '<div class="option-notes">' + escHtml(n) + '</div>';
         });
       }
 
-      html += '</div>';
-    });
+      h += '</div>';
+      return h;
+    }
+
+    function renderCards(from, to) {
+      var h = "";
+      for (var i = from; i < to; i++) {
+        h += buildCard(options[i], i);
+      }
+      return h;
+    }
+
+    var html = "";
+    if (tieCount > 1) {
+      html += '<div class="ties-summary">' + tieCount + ' routes at the cheapest fare (\u20b1' + formatFare(minFare) + ')</div>';
+    }
+
+    var INITIAL_CAP = 10;
+    var needsToggle = options.length > INITIAL_CAP;
+    var initialEnd = needsToggle ? INITIAL_CAP : options.length;
+
+    html += renderCards(0, initialEnd);
+
+    if (needsToggle) {
+      html += '<button class="show-more-btn" id="show-more-btn">Show all ' + options.length + ' options</button>';
+    }
 
     cgResults.innerHTML = html;
+
+    if (needsToggle) {
+      var remainingHtml = renderCards(INITIAL_CAP, options.length);
+      var showMoreBtn = document.getElementById("show-more-btn");
+      var expanded = false;
+      showMoreBtn.addEventListener("click", function () {
+        expanded = !expanded;
+        if (expanded) {
+          showMoreBtn.insertAdjacentHTML("beforebegin", remainingHtml);
+          showMoreBtn.textContent = "Show fewer";
+        } else {
+          var allCards = cgResults.querySelectorAll(".option-card");
+          for (var i = INITIAL_CAP; i < allCards.length; i++) {
+            allCards[i].remove();
+          }
+          showMoreBtn.textContent = "Show all " + options.length + " options";
+        }
+      });
+    }
   }
 
 })();
