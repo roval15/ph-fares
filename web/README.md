@@ -109,8 +109,20 @@ Successful response:
           "mode": "jeepney_traditional",
           "route_id": "MJ001",
           "route_long_name": "Shaw–Boni",
-          "board_stop": "Shaw Blvd",
-          "alight_stop": "Boni Ave",
+          "board_stop": {
+            "stop_id": "LTFRB-1234",
+            "stop_name": "Shaw Blvd",
+            "lat": 14.5813,
+            "lon": 121.0491,
+            "distance_m": 120.5
+          },
+          "alight_stop": {
+            "stop_id": "LTFRB-5678",
+            "stop_name": "Boni Ave",
+            "lat": 14.5876,
+            "lon": 121.0352,
+            "distance_m": 95.0
+          },
           "distance_km": 2.1
         },
         {
@@ -130,8 +142,11 @@ Successful response:
 
 Each leg is either `"type": "walk"` (with `distance_m` in meters) or
 `"type": "ride"` (with `mode`, `route_id`, `route_long_name`, `board_stop`,
-`alight_stop`, and `distance_km`). Walk legs are free; ride fares follow the
-LTFRB distance formula or the MRT-3 station table.
+`alight_stop`, and `distance_km`). `board_stop` and `alight_stop` are stop
+objects carrying `stop_id`, `stop_name`, `lat`, `lon`, and `distance_m` (the
+walking distance from the caller's point to the stop, in meters). Walk legs
+are free; ride fares follow the LTFRB distance formula or the MRT-3 station
+table.
 
 Invalid parameters return `400`. When no direct route connects the points
 the response is `200` with `"status": "no_route"` and a human-readable
