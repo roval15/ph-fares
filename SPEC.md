@@ -301,7 +301,75 @@ Commuter simulation: plan Shaw→Boni → all chips gray → submit confirmation
 disputed option sinks → jsonl is append-only and parseable. Then merge to
 main, push to GitHub, Telegram notify.
 
-### 9. README.md
+### 9. Epic E9: Landmark Anchoring (Grab-style location selection)
+
+**Goal:** anchor origin/destination to the nearest landmark, establishment, or
+building — the way Grab does — instead of a vague street segment. Commuters
+think "SM Megamall", not "Shaw Boulevard, Wack-Wack Greenhills, Eastern
+Manila District".
+
+**Flow (binding UX):**
+1. User types a location → geocode candidates (existing behavior).
+2. User taps a candidate → NEW anchor step: "Anchor to a landmark" panel
+   lists nearby named places sorted by distance: e.g. "Shaw Boulevard MRT
+   Station · 80 m", "SM Megamall · 240 m", plus a fallback row
+   "Use exact point".
+3. User taps a landmark → trip endpoint snaps to the POI coords; the
+   confirmed line shows the landmark name (with the area as context).
+4. If the POI fetch fails or returns nothing → silently fall back to exact
+   point. Landmark anchoring must NEVER block the trip flow.
+
+#### S9.1 — POI layer
+- `guide/pois.py`: `nearby_pois(lat, lon, radius_m=250, limit=5)` →
+  `[{name, category, distance_m, lat, lon, source}]`.
+  - Source 1 (offline, always first): MRT-3 stations from
+    data/mrt3_stations.json within radius (zero network).
+  - Source 2: Overpass API around-query for named places:
+    node/way with amenity|shop|tourism|railway=station|building+name within
+    radius. Only entries WITH a name tag. Mirror failover:
+    overpass-api.de → overpass.kumi.systems (10s timeout each).
+  - Merge, sort by distance, cap at limit. category from primary tag
+    (station/mall/restaurant/office/building/...).
+  - Persistent cache keyed on coords rounded to ~50m grid
+    (`data/poi_cache.json`) — repeat queries for the same spot = zero HTTP.
+  - Graceful degradation: any Overpass failure → return offline results
+    only (or empty), with a warning; never raise to the caller.
+  - User-Agent header per OSM etiquette; max 1 req/sec.
+- Tests (mocked HTTP): distance sorting, MRT station inclusion offline,
+  cache zero-second-call, degradation when both mirrors fail, name-tag
+  filtering.
+
+AC: (1) suite green incl. all pre-existing; (2) nearby_pois around Shaw MRT
+coords (offline-only path) includes "Shaw MRT" at ~0 m; (3) mocked Overpass
+response merges + sorts correctly; (4) mirror failover + degradation tested;
+(5) no live network in the test suite.
+
+#### S9.2 — Anchor API + UI v4
+- `web/server.py`: `GET /api/pois?lat=&lon=&radius=250` → JSON
+  `{status:"ok", pois:[...]}` (empty list is ok, never 500).
+- `web/index.html` v4 (all prior tabs/features intact — chips, feedback
+  prompt, calculator, badge cap, show-more):
+  - After a geocode candidate is tapped, fetch /api/pois and render the
+    anchor panel (name + category icon/label + distance). Tap → snap.
+  - "Use exact point" always available as the last row.
+  - Confirmed line shows landmark name + area context.
+  - Loading state ("Finding landmarks nearby…"), failure state = skip
+    silently to exact point.
+  - Mobile-first 375px, no npm, no maps.
+- Tests for the endpoint + graceful empty/degraded responses.
+
+AC: (1) /api/pois around Shaw MRT coords returns the station; (2) around a
+random Mandaluyong point returns ≥1 named POI or empty-ok (never 500);
+(3) UI anchor panel renders from the endpoint; (4) all prior regressions
+green (chips, feedback, calculator 18.30, badge cap, suite).
+
+#### E9 Gate
+Commuter simulation: type "Shaw Boulevard Mandaluyong" → tap candidate →
+anchor panel shows Shaw MRT / nearby establishments → tap anchor → plan
+uses landmark coords. Failure-path check: POI endpoint degraded → flow
+continues on exact point. Merge → push → Telegram.
+
+### 10. README.md
 
 What this is, the pilot scope, the data availability table above, how to
 use the library, how to contribute fare updates (PR with source citation),
