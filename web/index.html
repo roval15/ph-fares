@@ -45,6 +45,34 @@
   header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
   header p { font-size: 0.875rem; opacity: 0.85; margin-top: 0.25rem; }
 
+  /* ---- tab bar ---- */
+  .tab-bar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--accent);
+    border-bottom: 2px solid var(--accent-light);
+  }
+  .tab-bar button {
+    flex: 1;
+    padding: 0.65rem 0;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.65);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+    border-bottom: 3px solid transparent;
+  }
+  .tab-bar button:hover { color: rgba(255,255,255,0.85); }
+  .tab-bar button.active {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    border-bottom-color: #fff;
+  }
+
   /* ---- section labels ---- */
   .label {
     font-size: 0.7rem;
@@ -54,6 +82,10 @@
     color: var(--muted);
     margin-bottom: 0.5rem;
   }
+
+  /* ---- tab panels ---- */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
 
   /* ---- trip selector ---- */
   .section { margin-top: 1.25rem; }
@@ -186,6 +218,139 @@
 
   .loading { text-align: center; padding: 1.5rem 0; color: var(--muted); font-size: 0.85rem; }
 
+  /* ---- commute guide specific ---- */
+  .cg-input-group { margin-top: 0.75rem; }
+  .cg-input-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .cg-input-group input[type="text"] {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .cg-input-group input[type="text"]:focus { border-color: var(--accent); }
+
+  .cg-search-btn {
+    margin-top: 0.75rem;
+    width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .cg-search-btn:hover { background: #152d4a; }
+  .cg-search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .cg-plan-btn {
+    margin-top: 0.75rem;
+    width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--green);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .cg-plan-btn:hover { background: #138a3d; }
+  .cg-plan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .cg-candidates {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .cg-candidate {
+    background: var(--card);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .cg-candidate:hover { border-color: var(--accent); }
+  .cg-candidate.selected {
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .cg-candidate .cg-cand-name { font-weight: 500; }
+  .cg-candidate .cg-cand-coords { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+
+  .cg-confirmed {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--green-bg);
+    border: 2px solid var(--green);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #15803d;
+    display: none;
+  }
+  .cg-confirmed.show { display: block; }
+
+  /* ---- option card (plan results) ---- */
+  .option-card {
+    background: var(--card);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 0.875rem;
+    margin-bottom: 0.625rem;
+  }
+  .option-card.cheapest-opt {
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .option-total {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .option-card.cheapest-opt .option-total { color: var(--green); }
+  .option-currency { font-size: 0.75rem; color: var(--muted); margin-left: 0.15rem; }
+
+  .leg-card {
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    border: 1px solid var(--border-light);
+  }
+  .leg-card .leg-mode { font-weight: 600; }
+  .leg-card .leg-detail { color: var(--muted); font-size: 0.75rem; margin-top: 0.1rem; }
+
+  .option-notes {
+    margin-top: 0.4rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
   /* ---- footer ---- */
   footer {
     margin-top: 2rem;
@@ -208,7 +373,48 @@
   </div>
 </header>
 
-<main class="container">
+<nav class="tab-bar" role="tablist">
+  <button role="tab" class="active" data-tab="commute-guide" aria-selected="true">Commute Guide</button>
+  <button role="tab" data-tab="fare-calculator" aria-selected="false">Fare Calculator</button>
+</nav>
+
+<!-- ===== COMMUTE GUIDE TAB ===== -->
+<main class="container tab-panel active" id="panel-commute-guide" role="tabpanel">
+
+  <section class="section">
+    <div class="label">Search locations</div>
+
+    <div class="cg-input-group">
+      <label for="cg-origin">Origin</label>
+      <input type="text" id="cg-origin" placeholder="e.g. Shaw Blvd, Mandaluyong" autocomplete="off">
+    </div>
+    <div class="cg-input-group">
+      <label for="cg-dest">Destination</label>
+      <input type="text" id="cg-dest" placeholder="e.g. Boni Ave, Mandaluyong" autocomplete="off">
+    </div>
+
+    <button class="cg-search-btn" id="cg-search-btn">Search</button>
+
+    <div class="error-msg" id="cg-error"></div>
+
+    <div id="cg-origin-candidates" class="cg-candidates"></div>
+    <div id="cg-origin-confirmed" class="cg-confirmed"></div>
+
+    <div id="cg-dest-candidates" class="cg-candidates"></div>
+    <div id="cg-dest-confirmed" class="cg-confirmed"></div>
+
+    <button class="cg-plan-btn" id="cg-plan-btn" disabled>Plan Trip</button>
+  </section>
+
+  <section class="section">
+    <div class="label">Route options</div>
+    <div id="cg-results" class="results"></div>
+  </section>
+
+</main>
+
+<!-- ===== FARE CALCULATOR TAB ===== -->
+<main class="container tab-panel" id="panel-fare-calculator" role="tabpanel">
 
   <!-- Preset trips -->
   <section class="section">
@@ -254,7 +460,7 @@
 <footer>
   <div class="container">
     Estimates only &mdash; actual fares may vary. LTFRB circulars supersede these figures.<br>
-    Pilot data for Mandaluyong City &middot; Data as of Aug 2026
+    Commute guide uses OpenStreetMap / Nominatim data. Pilot data for Mandaluyong City &middot; Data as of Aug 2026
   </div>
 </footer>
 
@@ -262,9 +468,45 @@
 (function () {
   "use strict";
 
+  /* ================================================================
+     SHARED HELPERS
+     ================================================================ */
+
+  function escHtml(s) {
+    var d = document.createElement("div");
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+
+  function formatFare(n) {
+    return n.toFixed(2);
+  }
+
+  /* ================================================================
+     TAB SWITCHING
+     ================================================================ */
+
+  var tabs = document.querySelectorAll(".tab-bar button");
+  var panels = document.querySelectorAll(".tab-panel");
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      tabs.forEach(function (t) { t.classList.remove("active"); t.setAttribute("aria-selected", "false"); });
+      panels.forEach(function (p) { p.classList.remove("active"); });
+      tab.classList.add("active");
+      tab.setAttribute("aria-selected", "true");
+      var target = document.getElementById("panel-" + tab.getAttribute("data-tab"));
+      if (target) target.classList.add("active");
+    });
+  });
+
+  /* ================================================================
+     FARE CALCULATOR (preserved verbatim)
+     ================================================================ */
+
   var DISTANCE_MODES = [
-    { id: "jeepney_traditional", label: "Traditional Jeepney", detail: "₱12 base (first 4 km), ₱1.80/km after" },
-    { id: "jeepney_modern",     label: "Modern Jeepney",      detail: "₱14 base (first 4 km), ₱2.20/km after" }
+    { id: "jeepney_traditional", label: "Traditional Jeepney", detail: "\u20b112 base (first 4 km), \u20b11.80/km after" },
+    { id: "jeepney_modern",     label: "Modern Jeepney",      detail: "\u20b114 base (first 4 km), \u20b12.20/km after" }
   ];
 
   var kmInput   = document.getElementById("km-input");
@@ -274,8 +516,6 @@
   var tripBtns  = document.querySelectorAll(".trip-btn");
 
   var debounceTimer = null;
-
-  // -- preset trips -----------------------------------------------------------
 
   tripBtns.forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -288,10 +528,7 @@
     });
   });
 
-  // -- custom input -----------------------------------------------------------
-
   kmInput.addEventListener("input", function () {
-    // deselect presets
     tripBtns.forEach(function (b) { b.classList.remove("active"); });
     syncSlider();
     debouncedFetch();
@@ -317,8 +554,6 @@
       fetchFares(km);
     }, 120);
   }
-
-  // -- fetch fares -----------------------------------------------------------
 
   function fetchFares(km) {
     if (isNaN(km) || km <= 0) {
@@ -379,7 +614,6 @@
       return;
     }
 
-    // find cheapest
     var minFare = Infinity;
     successful.forEach(function (s) { if (s.fare < minFare) minFare = s.fare; });
 
@@ -394,7 +628,7 @@
             '<div class="mode-name">' + escHtml(s.label) + badge + '</div>' +
             '<div class="mode-detail">' + escHtml(s.detail) + '</div>' +
           '</div>' +
-          '<div class="fare-amount">₱' + formatFare(s.fare) + '</div>' +
+          '<div class="fare-amount">\u20b1' + formatFare(s.fare) + '</div>' +
         '</div>';
     });
 
@@ -407,21 +641,227 @@
     resultsEl.innerHTML = html;
   }
 
-  // -- helpers ----------------------------------------------------------------
-
-  function formatFare(n) {
-    // ensure 2 decimal places
-    return n.toFixed(2);
-  }
-
-  function escHtml(s) {
-    var d = document.createElement("div");
-    d.appendChild(document.createTextNode(s));
-    return d.innerHTML;
-  }
-
-  // -- init -------------------------------------------------------------------
   fetchFares(parseFloat(kmInput.value));
+
+  /* ================================================================
+     COMMUTE GUIDE
+     ================================================================ */
+
+  var cgOriginInput   = document.getElementById("cg-origin");
+  var cgDestInput     = document.getElementById("cg-dest");
+  var cgSearchBtn     = document.getElementById("cg-search-btn");
+  var cgPlanBtn       = document.getElementById("cg-plan-btn");
+  var cgError         = document.getElementById("cg-error");
+  var cgOriginCands   = document.getElementById("cg-origin-candidates");
+  var cgOriginConf    = document.getElementById("cg-origin-confirmed");
+  var cgDestCands     = document.getElementById("cg-dest-candidates");
+  var cgDestConf      = document.getElementById("cg-dest-confirmed");
+  var cgResults       = document.getElementById("cg-results");
+
+  var selectedOrigin = null;  // {display_name, lat, lon}
+  var selectedDest   = null;
+
+  function cgShowError(msg) {
+    cgError.textContent = msg;
+    cgError.classList.add("show");
+  }
+  function cgHideError() {
+    cgError.classList.remove("show");
+  }
+
+  function updatePlanBtn() {
+    cgPlanBtn.disabled = !(selectedOrigin && selectedDest);
+  }
+
+  function renderCandidates(container, candidates, onSelect) {
+    container.innerHTML = "";
+    if (candidates.length === 0) {
+      container.innerHTML = '<div class="mode-unavailable">No places matched your search &mdash; try a different spelling or add \'Mandaluyong\'.</div>';
+      return;
+    }
+    candidates.forEach(function (c) {
+      var row = document.createElement("div");
+      row.className = "cg-candidate";
+      row.innerHTML =
+        '<div class="cg-cand-name">' + escHtml(c.display_name) + '</div>' +
+        '<div class="cg-cand-coords">' + c.lat.toFixed(5) + ', ' + c.lon.toFixed(5) + '</div>';
+      row.addEventListener("click", function () {
+        container.querySelectorAll(".cg-candidate").forEach(function (el) { el.classList.remove("selected"); });
+        row.classList.add("selected");
+        onSelect(c);
+      });
+      container.appendChild(row);
+    });
+  }
+
+  function confirmSelection(confEl, cand, container) {
+    confEl.textContent = escHtml(cand.display_name) + " (" + cand.lat.toFixed(5) + ", " + cand.lon.toFixed(5) + ")";
+    confEl.classList.add("show");
+    container.innerHTML = "";
+  }
+
+  cgSearchBtn.addEventListener("click", function () {
+    cgHideError();
+    var originQ = cgOriginInput.value.trim();
+    var destQ   = cgDestInput.value.trim();
+
+    if (!originQ && !destQ) {
+      cgShowError("Please enter at least one location to search.");
+      return;
+    }
+
+    cgSearchBtn.disabled = true;
+    cgSearchBtn.textContent = "Searching\u2026";
+    cgResults.innerHTML = "";
+    selectedOrigin = null;
+    selectedDest = null;
+    updatePlanBtn();
+    cgOriginConf.classList.remove("show");
+    cgDestConf.classList.remove("show");
+
+    var pending = 0;
+    var originResult = null;
+    var destResult = null;
+
+    function done() {
+      cgSearchBtn.disabled = false;
+      cgSearchBtn.textContent = "Search";
+
+      if (originQ && originResult !== null) {
+        if (originResult.status === "ok") {
+          renderCandidates(cgOriginCands, originResult.candidates, function (c) {
+            selectedOrigin = c;
+            confirmSelection(cgOriginConf, c, cgOriginCands);
+            updatePlanBtn();
+          });
+        } else {
+          cgShowError(originResult.message || "Geocoding failed for origin.");
+        }
+      }
+      if (destQ && destResult !== null) {
+        if (destResult.status === "ok") {
+          renderCandidates(cgDestCands, destResult.candidates, function (c) {
+            selectedDest = c;
+            confirmSelection(cgDestConf, c, cgDestCands);
+            updatePlanBtn();
+          });
+        } else {
+          cgShowError(destResult.message || "Geocoding failed for destination.");
+        }
+      }
+    }
+
+    if (originQ) {
+      pending++;
+      fetch("/api/geocode?q=" + encodeURIComponent(originQ))
+        .then(function (r) { return r.json(); })
+        .then(function (d) { originResult = d; })
+        .catch(function () { originResult = { status: "error", message: "Network error while searching origin. Please check your connection." }; })
+        .then(function () { pending--; if (pending === 0) done(); });
+    }
+    if (destQ) {
+      pending++;
+      fetch("/api/geocode?q=" + encodeURIComponent(destQ))
+        .then(function (r) { return r.json(); })
+        .then(function (d) { destResult = d; })
+        .catch(function () { destResult = { status: "error", message: "Network error while searching destination. Please check your connection." }; })
+        .then(function () { pending--; if (pending === 0) done(); });
+    }
+  });
+
+  cgPlanBtn.addEventListener("click", function () {
+    if (!selectedOrigin || !selectedDest) return;
+
+    cgHideError();
+    cgResults.innerHTML = '<div class="loading">Planning trip&hellip;</div>';
+    cgPlanBtn.disabled = true;
+
+    var url = "/api/plan?from_lat=" + encodeURIComponent(selectedOrigin.lat) +
+              "&from_lon=" + encodeURIComponent(selectedOrigin.lon) +
+              "&to_lat=" + encodeURIComponent(selectedDest.lat) +
+              "&to_lon=" + encodeURIComponent(selectedDest.lon);
+
+    fetch(url)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        cgPlanBtn.disabled = false;
+        if (data.status === "ok") {
+          renderPlanResults(data.options);
+        } else if (data.status === "no_route") {
+          cgResults.innerHTML =
+            '<div class="mode-unavailable">No direct route found between these points yet. Try points closer to Mandaluyong routes or the MRT-3 line.</div>';
+        } else {
+          cgResults.innerHTML = '<div class="mode-unavailable">' + escHtml(data.message || "Something went wrong planning your trip.") + '</div>';
+        }
+      })
+      .catch(function () {
+        cgPlanBtn.disabled = false;
+        cgResults.innerHTML = '<div class="mode-unavailable">Network error while planning. Please check your connection and try again.</div>';
+      });
+  });
+
+  var MODE_LABELS = {
+    "jeepney_traditional": "Traditional Jeepney",
+    "jeepney_modern": "Modern Jeepney",
+    "mrt3": "MRT-3"
+  };
+
+  function renderPlanResults(options) {
+    if (!options || options.length === 0) {
+      cgResults.innerHTML = '<div class="mode-unavailable">No route options found.</div>';
+      return;
+    }
+
+    var minFare = Infinity;
+    options.forEach(function (o) {
+      var f = typeof o.total_fare === "number" ? o.total_fare : parseFloat(o.total_fare);
+      if (f < minFare) minFare = f;
+    });
+
+    var html = "";
+    options.forEach(function (opt) {
+      var fare = typeof opt.total_fare === "number" ? opt.total_fare : parseFloat(opt.total_fare);
+      var cheapest = fare === minFare && options.length > 1;
+      var cardCls = "option-card" + (cheapest ? " cheapest-opt" : "");
+      var badge = cheapest ? '<span class="cheapest-badge">Cheapest</span>' : "";
+
+      html += '<div class="' + cardCls + '">';
+      html += '<div class="option-header">';
+      html += '<div class="option-total">\u20b1' + formatFare(fare) + badge + '</div>';
+      html += '</div>';
+
+      if (opt.legs) {
+        opt.legs.forEach(function (leg) {
+          html += '<div class="leg-card">';
+          if (leg.type === "walk") {
+            var meters = Math.round(leg.distance_m);
+            html += '<span class="leg-mode">Walk</span> ' + meters + ' m';
+          } else if (leg.type === "ride") {
+            var modeLabel = MODE_LABELS[leg.mode] || leg.mode;
+            html += '<span class="leg-mode">' + escHtml(modeLabel) + '</span>';
+            html += '<div class="leg-detail">' +
+              escHtml(leg.route_long_name || "") + '<br>' +
+              escHtml(leg.board_stop ? leg.board_stop.stop_name : "") +
+              ' &rarr; ' +
+              escHtml(leg.alight_stop ? leg.alight_stop.stop_name : "") +
+              ' &middot; ' + leg.distance_km.toFixed(1) + ' km' +
+              '</div>';
+          }
+          html += '</div>';
+        });
+      }
+
+      if (opt.notes && opt.notes.length > 0) {
+        opt.notes.forEach(function (n) {
+          html += '<div class="option-notes">' + escHtml(n) + '</div>';
+        });
+      }
+
+      html += '</div>';
+    });
+
+    cgResults.innerHTML = html;
+  }
 
 })();
 </script>
