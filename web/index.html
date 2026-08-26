@@ -618,6 +618,121 @@
     color: var(--muted);
   }
   .community-strip .steward-row .steward-name { color: var(--text); font-weight: 500; }
+
+  /* ---- tracking panel ---- */
+  .track-panel {
+    margin-top: 0.75rem;
+    padding: 0.75rem 0.875rem;
+    background: var(--card);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+  }
+  .track-panel h4 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.35rem;
+  }
+  .track-panel .track-muted {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .track-btn {
+    display: inline-block;
+    padding: 0.55rem 1rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .track-btn:hover { background: #152d4a; }
+  .track-btn.end-ride {
+    background: #dc2626;
+  }
+  .track-btn.end-ride:hover { background: #b91c1c; }
+  .track-status {
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    min-height: 1.2em;
+  }
+  .track-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .track-controls label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+  }
+  .track-summary {
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    background: var(--green-bg);
+    border: 1px solid var(--green);
+    border-radius: var(--radius);
+    font-size: 0.78rem;
+    color: #15803d;
+    font-weight: 500;
+  }
+
+  /* ---- live dot ---- */
+  @keyframes pulse-ring {
+    0%   { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .live-dot {
+    position: relative;
+  }
+  .live-dot-inner {
+    width: 14px; height: 14px;
+    background: #2563eb;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(37, 99, 235, 0.6);
+  }
+  .live-dot-pulse {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 14px; height: 14px;
+    margin: -7px 0 0 -7px;
+    background: rgba(37, 99, 235, 0.3);
+    border-radius: 50%;
+    animation: pulse-ring 1.2s ease-out infinite;
+  }
+
+  /* ---- center-on-me button ---- */
+  .center-me-btn {
+    position: absolute;
+    bottom: 50px;
+    right: 10px;
+    z-index: 1000;
+    width: 34px; height: 34px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--accent);
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+  }
+  .center-me-btn:hover { background: var(--accent-light); }
+  .center-me-btn.show { display: flex; }
 </style>
 </head>
 <body>
@@ -663,6 +778,8 @@
   </section>
 
   <div id="cg-map-wrap"></div>
+
+  <div id="cg-track-panel" class="track-panel" style="display:none;"></div>
 
   <section class="section">
     <div class="label">Route options</div>
@@ -726,6 +843,7 @@
   </div>
 </footer>
 
+<script src="tracking-core.js"></script>
 <script>
 (function () {
   "use strict";
@@ -1138,6 +1256,7 @@
           renderMap(data.options);
           renderFeedbackPrompt(data.options);
           fetchCommunityStrip();
+          fetchTrackingConfig().then(function () { renderTrackPanel(); });
         } else if (data.status === "no_route") {
           teardownMap();
           cgResults.innerHTML =
@@ -1321,6 +1440,7 @@
   var cgMapAllGroup = null;
 
   function teardownMap() {
+    if (typeof resetTracking === "function") resetTracking();
     if (cgMap) { cgMap.remove(); cgMap = null; }
     cgMapSegments = null;
     cgMapAllGroup = null;
@@ -1696,6 +1816,353 @@
 
     cgCommunityStrip.innerHTML = h;
     cgCommunityStrip.style.display = "block";
+  }
+
+  /* ================================================================
+     TRACKING (GPS ride-along)
+     ================================================================ */
+
+  var cgTrackPanel = document.getElementById("cg-track-panel");
+  var trackingEnabled = false;
+  var trackingCore = null;
+  var trackWatchId = null;
+  var trackTripId = null;
+  var trackMarker = null;
+  var trackStartTime = 0;
+  var trackPointCount = 0;
+  var trackDistanceKm = 0;
+  var trackLastLat = null;
+  var trackLastLon = null;
+  var trackStatusEl = null;
+  var trackCenterBtn = null;
+  var trackPendingBuffer = [];
+
+  window.__trackingState = {
+    intervalMs: 15000,
+    saver: true,
+    bufferLength: 0
+  };
+
+  function fetchTrackingConfig() {
+    return fetch("/api/config")
+      .then(function (r) { return r.json(); })
+      .then(function (d) { trackingEnabled = !!d.tracking_enabled; })
+      .catch(function () { trackingEnabled = false; });
+  }
+
+  function renderTrackPanel() {
+    if (!trackingEnabled) {
+      cgTrackPanel.innerHTML =
+        '<h4>\ud83d\ude00 Track this ride</h4>' +
+        '<div class="track-muted">Ride tracking ships with the deployed app.</div>';
+      cgTrackPanel.style.display = "block";
+      return;
+    }
+
+    cgTrackPanel.innerHTML =
+      '<h4>\ud83d\ude00 Track this ride</h4>' +
+      '<div class="track-controls">' +
+        '<button class="track-btn" id="track-start-btn">\ud83d\udce1 Track this ride</button>' +
+        '<label><input type="checkbox" id="battery-saver" checked> Battery saver</label>' +
+      '</div>' +
+      '<div class="track-status" id="track-status"></div>';
+    cgTrackPanel.style.display = "block";
+
+    document.getElementById("track-start-btn").addEventListener("click", startTracking);
+  }
+
+  function renderTrackActive() {
+    cgTrackPanel.innerHTML =
+      '<div class="track-controls">' +
+        '<button class="track-btn end-ride" id="track-stop-btn">End ride</button>' +
+        '<label><input type="checkbox" id="battery-saver" checked> Battery saver</label>' +
+      '</div>' +
+      '<div class="track-status" id="track-status">Starting\u2026</div>';
+    cgTrackPanel.style.display = "block";
+
+    document.getElementById("track-stop-btn").addEventListener("click", stopTracking);
+
+    var saverCb = document.getElementById("battery-saver");
+    saverCb.addEventListener("change", function () {
+      if (trackWatchId !== null) {
+        restartWatch();
+      }
+    });
+
+    // Add center-on-me button to map card
+    var mapCard = cgMapWrap.querySelector(".map-card");
+    if (mapCard) {
+      mapCard.style.position = "relative";
+      trackCenterBtn = document.createElement("button");
+      trackCenterBtn.className = "center-me-btn";
+      trackCenterBtn.textContent = "\u2316";
+      trackCenterBtn.title = "Center on me";
+      trackCenterBtn.addEventListener("click", function () {
+        if (trackLastLat !== null && trackLastLon !== null && cgMap) {
+          cgMap.setView([trackLastLat, trackLastLon], cgMap.getZoom());
+        }
+      });
+      mapCard.appendChild(trackCenterBtn);
+    }
+
+    trackStatusEl = document.getElementById("track-status");
+  }
+
+  function getGeoOptions() {
+    var saverCb = document.getElementById("battery-saver");
+    var saver = saverCb ? saverCb.checked : true;
+    if (saver) {
+      return { enableHighAccuracy: false, maximumAge: 15000, timeout: 30000 };
+    }
+    return { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 };
+  }
+
+  function getThrottleInterval() {
+    var saverCb = document.getElementById("battery-saver");
+    var saver = saverCb ? saverCb.checked : true;
+    return saver ? 15000 : 5000;
+  }
+
+  function restartWatch() {
+    if (trackWatchId !== null) {
+      navigator.geolocation.clearWatch(trackWatchId);
+      trackWatchId = null;
+    }
+    var interval = getThrottleInterval();
+    trackingCore.intervalMs = interval;
+    window.__trackingState.intervalMs = interval;
+    window.__trackingState.saver = document.getElementById("battery-saver")
+      ? document.getElementById("battery-saver").checked : true;
+
+    trackWatchId = navigator.geolocation.watchPosition(
+      onPosition,
+      onPositionError,
+      getGeoOptions()
+    );
+  }
+
+  function startTracking() {
+    var alias = localStorage.getItem("phfares_alias") || null;
+
+    fetch("/api/track/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ alias: alias }),
+      keepalive: true
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        trackTripId = data.trip_id;
+        trackStartTime = Date.now();
+        trackPointCount = 0;
+        trackDistanceKm = 0;
+        trackLastLat = null;
+        trackLastLon = null;
+        trackPendingBuffer = [];
+
+        var interval = getThrottleInterval();
+        trackingCore = window.TrackingCore({ intervalMs: interval });
+        window.__trackingState.intervalMs = interval;
+        window.__trackingState.saver = true;
+
+        renderTrackActive();
+
+        // Center map on user's first fix
+        if (cgMap) {
+          cgMap.once("locationfound", function (e) {
+            cgMap.setView(e.latlng, 16);
+          });
+        }
+
+        trackWatchId = navigator.geolocation.watchPosition(
+          onPosition,
+          onPositionError,
+          getGeoOptions()
+        );
+      })
+      .catch(function () {
+        showToast("Failed to start tracking. Please try again.");
+      });
+  }
+
+  function onPosition(pos) {
+    var now = performance.now();
+    if (!trackingCore.shouldSend(now)) return;
+
+    var lat = pos.coords.latitude;
+    var lon = pos.coords.longitude;
+    var ts = pos.timestamp / 1000;
+    var accuracy = pos.coords.accuracy || 999;
+
+    trackPointCount++;
+    window.__trackingState.bufferLength = trackingCore.bufferLength;
+
+    // Update live dot
+    updateLiveDot(lat, lon);
+
+    // Update distance
+    if (trackLastLat !== null) {
+      trackDistanceKm += haversineTrack(trackLastLat, trackLastLon, lat, lon);
+    }
+    trackLastLat = lat;
+    trackLastLon = lon;
+
+    updateTrackStatus();
+
+    // Send point + retry buffer
+    var point = { trip_id: trackTripId, lat: lat, lon: lon, ts: ts, accuracy: accuracy };
+    var buffer = trackingCore.takeBuffer();
+    var allToSend = buffer.concat([point]);
+
+    allToSend.forEach(function (p) {
+      fetch("/api/track/point", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(p),
+        keepalive: true
+      }).catch(function () {
+        trackingCore.onSendFailure(p);
+        window.__trackingState.bufferLength = trackingCore.bufferLength;
+      });
+    });
+  }
+
+  function onPositionError(err) {
+    if (err.code === 1) {
+      // Permission denied
+      if (trackStatusEl) {
+        trackStatusEl.textContent = "Enable location to track this ride \u2014 the map still works without it";
+      }
+      if (trackWatchId !== null) {
+        navigator.geolocation.clearWatch(trackWatchId);
+        trackWatchId = null;
+      }
+    } else {
+      // Position unavailable or timeout — keep trying
+      if (trackStatusEl) {
+        trackStatusEl.textContent = "waiting for GPS\u2026";
+      }
+    }
+  }
+
+  function updateLiveDot(lat, lon) {
+    if (!cgMap) return;
+    if (!trackMarker) {
+      var icon = L.divIcon({
+        className: "live-dot",
+        html: '<div class="live-dot-pulse"></div><div class="live-dot-inner"></div>',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+      });
+      trackMarker = L.marker([lat, lon], { icon: icon, zIndexOffset: 1000 }).addTo(cgMap);
+    } else {
+      trackMarker.setLatLng([lat, lon]);
+    }
+    if (trackCenterBtn) {
+      trackCenterBtn.classList.add("show");
+    }
+  }
+
+  function updateTrackStatus() {
+    if (!trackStatusEl) return;
+    var elapsed = Math.floor((Date.now() - trackStartTime) / 1000);
+    var mins = Math.floor(elapsed / 60);
+    var secs = elapsed % 60;
+    var timeStr = mins > 0 ? mins + "m " + secs + "s" : secs + "s";
+    trackStatusEl.textContent =
+      timeStr + " \u00b7 ~" + trackDistanceKm.toFixed(1) + " km \u00b7 " + trackPointCount + " pts" +
+      (trackingCore && trackingCore.bufferLength > 0 ? " \u00b7 " + trackingCore.bufferLength + " queued" : "");
+  }
+
+  function haversineTrack(lat1, lon1, lat2, lon2) {
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  function stopTracking() {
+    if (trackWatchId !== null) {
+      navigator.geolocation.clearWatch(trackWatchId);
+      trackWatchId = null;
+    }
+
+    var alias = localStorage.getItem("phfares_alias") || null;
+
+    fetch("/api/track/stop", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trip_id: trackTripId, alias: alias }),
+      keepalive: true
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        // Show summary
+        var summaryHtml = "Saved " + (data.point_count || 0) + " points, ~" +
+          (data.distance_km || 0).toFixed(1) + " km";
+        cgTrackPanel.innerHTML =
+          '<div class="track-summary">' + escHtml(summaryHtml) + '</div>' +
+          '<div class="track-controls" style="margin-top:0.4rem;">' +
+            '<button class="track-btn" id="track-start-btn">\ud83d\udce1 Track this ride</button>' +
+            '<label><input type="checkbox" id="battery-saver" checked> Battery saver</label>' +
+          '</div>';
+        document.getElementById("track-start-btn").addEventListener("click", startTracking);
+
+        // Remove live dot marker
+        if (trackMarker && cgMap) {
+          cgMap.removeLayer(trackMarker);
+          trackMarker = null;
+        }
+        // Remove center button
+        if (trackCenterBtn) {
+          trackCenterBtn.remove();
+          trackCenterBtn = null;
+        }
+
+        trackTripId = null;
+        trackLastLat = null;
+        trackLastLon = null;
+        trackPointCount = 0;
+        trackDistanceKm = 0;
+        if (trackingCore) {
+          trackingCore.reset();
+          trackingCore = null;
+        }
+        window.__trackingState.bufferLength = 0;
+      })
+      .catch(function () {
+        showToast("Failed to save trip. Data may be lost.");
+      });
+  }
+
+  function resetTracking() {
+    if (trackWatchId !== null) {
+      navigator.geolocation.clearWatch(trackWatchId);
+      trackWatchId = null;
+    }
+    trackTripId = null;
+    if (trackMarker && cgMap) {
+      cgMap.removeLayer(trackMarker);
+      trackMarker = null;
+    }
+    if (trackCenterBtn) {
+      trackCenterBtn.remove();
+      trackCenterBtn = null;
+    }
+    trackLastLat = null;
+    trackLastLon = null;
+    trackPointCount = 0;
+    trackDistanceKm = 0;
+    if (trackingCore) {
+      trackingCore.reset();
+      trackingCore = null;
+    }
+    window.__trackingState.bufferLength = 0;
+    cgTrackPanel.style.display = "none";
   }
 
 })();
