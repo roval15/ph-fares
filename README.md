@@ -81,13 +81,33 @@ Exact distance-based pricing requires applying the formula from
 python3 web/server.py
 ```
 
-Opens **http://127.0.0.1:8330** (set `HOST` env var to override bind
-address). The UI is a single static HTML page with preset trips, custom
-distance input, and live mode comparison. Backed by a JSON API:
-`GET /api/fare?mode=<mode>&km=<n>`.
+Opens **http://127.0.0.1:8330** (set `HOST` and `PORT` env vars to override
+bind address and port). The UI has two tabs — **Commute Guide** and **Fare
+Calculator**. Backed by a JSON API (see `web/README.md` for details).
 
 **This is a pilot artifact only.** No maps, estimates only, not a production
 service.
+
+## Commute Guide
+
+The Commute Guide tab provides location-to-location trip planning with
+fare breakdowns. Enter an origin and destination and the planner returns
+one or more options, each showing individual legs (walk, jeepney ride, or
+MRT-3 trip) with per-leg fare breakdowns and a total fare.
+
+Jeepney options include walk legs to the nearest stop, a ride leg priced
+using the LTFRB distance formula from `data/fares.json`, and walk legs
+from the alighting stop to the destination. MRT-3 options use walk legs
+to the nearest stations and a station-to-station fare from the pricing
+table (PHP 13/16/20/24/28 bands). Results are sorted cheapest-first.
+
+Geocoding is powered by OpenStreetMap Nominatim — type a place name and
+the guide resolves candidates with coordinates.
+
+**Coverage note:** The pilot covers Mandaluyong City with direct routes
+only — no transfers. Some geographically valid trips will legitimately
+return "no route found" because a single direct jeepney or MRT connection
+does not exist for that pair of points.
 
 ## Testing
 
