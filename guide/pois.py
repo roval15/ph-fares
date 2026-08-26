@@ -229,14 +229,18 @@ def _parse_overpass_elements(elements: list[dict]) -> list[dict]:
     return results
 
 
-def _fetch_overpass(lat: float, lon: float, radius_m: int, limit: int) -> list[dict]:
-    """Query Overpass mirrors with failover; returns POI list or empty."""
+def _fetch_overpass(lat: float, lon: float, radius_m: int, limit: int) -> list[dict] | None:
+    """Query Overpass mirrors with failover.
+
+    Returns a list of POI dicts (empty list when the query succeeds but finds
+    nothing) or ``None`` when every mirror fails — allowing the caller to
+    distinguish "no results" from "could not reach Overpass".
+    """
     global _last_request_ts
     query = _build_overpass_query(lat, lon, radius_m, limit)
 
     for mirror_url in OVERPASS_MIRRORS:
         # Rate limit
-        global _last_request_ts
         elapsed = time.monotonic() - _last_request_ts
         if elapsed < _MIN_INTERVAL:
             time.sleep(_MIN_INTERVAL - elapsed)
@@ -261,7 +265,7 @@ def _fetch_overpass(lat: float, lon: float, radius_m: int, limit: int) -> list[d
             )
             continue
 
-    return []
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -291,14 +295,16 @@ def nearby_pois(lat: float, lon: float, radius_m: int = 250, limit: int = 5) -> 
     else:
         # Generous limit for Overpass so we can sort + cap locally
         overpass_pois = _fetch_overpass(lat, lon, radius_m, limit=max(limit * 4, 20))
-        # Compute distance for each
-        for poi in overpass_pois:
-            poi["distance_m"] = _haversine(lat, lon, poi["lat"], poi["lon"])
-        # Cache only the overpass results
-        cache[key] = overpass_pois
-        _save_cache()
+        if overpass_pois is not None:
+            # Compute distance for each
+            for poi in overpass_pois:
+                poi["distance_m"] = _haversine(lat, lon, poi["lat"], poi["lon"])
+            # Cache only the overpass results
+            cache[key] = overpass_pois
+            _save_cache()
 
-    results.extend(overpass_pois)
+    if overpass_pois is not None:
+        results.extend(overpass_pois)
 
     # 3. Sort by distance, cap at limit
     results.sort(key=lambda p: p["distance_m"])
