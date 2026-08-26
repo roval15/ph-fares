@@ -499,3 +499,120 @@ class TestCommunityAPI:
         assert status == 200
         assert data["total_reports"] == 0
         assert data["corridors"] == []
+
+
+class TestPoisAPI:
+    def test_shaw_mrt_offline_path(self, monkeypatch):
+        """/api/pois returns Shaw MRT from offline MRT data with Overpass mocked to fail."""
+        import guide.pois as pois_mod
+        def _fail_urlopen(*a, **kw):
+            raise ConnectionError("no network")
+        monkeypatch.setattr(pois_mod, "_urlopen", _fail_urlopen)
+        monkeypatch.setattr(pois_mod, "OVERPASS_MIRRORS", ["https://mirror1.test"])
+        monkeypatch.setattr(pois_mod, "_cache", None)
+
+        status, data = _get_response("/api/pois?lat=14.581&lon=121.054")
+        assert status == 200
+        assert data["status"] == "ok"
+        names = [p["name"] for p in data["pois"]]
+        assert any("Shaw" in n for n in names)
+
+    def test_empty_overpass_returns_ok_empty(self, monkeypatch):
+        """/api/pois with mocked empty overpass returns 200 with empty pois list."""
+        import guide.pois as pois_mod
+        import json as _json
+
+        def _empty_urlopen(request, timeout=10):
+            class _Resp:
+                def read(self_inner):
+                    return _json.dumps({"elements": []}).encode()
+                def __enter__(self_inner):
+                    return self_inner
+                def __exit__(self_inner, *a):
+                    pass
+            return _Resp()
+
+        monkeypatch.setattr(pois_mod, "_urlopen", _empty_urlopen)
+        monkeypatch.setattr(pois_mod, "OVERPASS_MIRRORS", ["https://mirror1.test"])
+
+        status, data = _get_response("/api/pois?lat=14.600&lon=121.100")
+        assert status == 200
+        assert data["status"] == "ok"
+        assert isinstance(data["pois"], list)
+
+    def test_missing_lat(self):
+        status, data = _get_response("/api/pois?lon=121.054")
+        assert status == 400
+        assert data["status"] == "error"
+        assert "lat" in data["message"].lower()
+
+    def test_missing_lon(self):
+        status, data = _get_response("/api/pois?lat=14.581")
+        assert status == 400
+        assert data["status"] == "error"
+        assert "lon" in data["message"].lower()
+
+    def test_non_numeric_lon(self):
+        status, data = _get_response("/api/pois?lat=14.581&lon=abc")
+        assert status == 400
+        assert data["status"] == "error"
+        assert "longitude" in data["message"].lower()
+
+    def test_out_of_range_lat(self):
+        status, data = _get_response("/api/pois?lat=999&lon=121.054")
+        assert status == 400
+        assert data["status"] == "error"
+        assert "latitude" in data["message"].lower()
+
+    def test_out_of_range_lon(self):
+        status, data = _get_response("/api/pois?lat=14.581&lon=999")
+        assert status == 400
+        assert data["status"] == "error"
+        assert "longitude" in data["message"].lower()
+
+    def test_infinite_lat(self):
+        status, data = _get_response("/api/pois?lat=inf&lon=121.054")
+        assert status == 400
+        assert data["status"] == "error"
+
+    def test_degraded_nearby_pois_raises(self, monkeypatch):
+        """If nearby_pois itself raises, still return 200 with empty pois."""
+        def _boom(**kw):
+            raise RuntimeError("boom")
+        monkeypatch.setattr("web.server.guide_pois.nearby_pois", _boom)
+        status, data = _get_response("/api/pois?lat=14.581&lon=121.054")
+        assert status == 200
+        assert data["status"] == "ok"
+        assert data["pois"] == []
+
+    def test_radius_clamping_low(self, monkeypatch):
+        """Radius below 10 gets clamped to 10."""
+        captured = {}
+
+        def _capture(**kw):
+            captured.update(kw)
+            return []
+        monkeypatch.setattr("web.server.guide_pois.nearby_pois", _capture)
+
+        status, data = _get_response("/api/pois?lat=14.581&lon=121.054&radius=1")
+        assert status == 200
+        assert captured["radius_m"] == 10
+
+    def test_radius_clamping_high(self, monkeypatch):
+        """Radius above 2000 gets clamped to 2000."""
+        captured = {}
+
+        def _capture(**kw):
+            captured.update(kw)
+            return []
+        monkeypatch.setattr("web.server.guide_pois.nearby_pois", _capture)
+
+        status, data = _get_response("/api/pois?lat=14.581&lon=121.054&radius=9999")
+        assert status == 200
+        assert captured["radius_m"] == 2000
+
+    def test_bad_radius_returns_400(self):
+        status, data = _get_response("/api/pois?lat=14.581&lon=121.054&radius=abc")
+        assert status == 400
+        assert data["status"] == "error"
+        assert "radius" in data["message"].lower()

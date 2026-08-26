@@ -308,6 +308,42 @@
   }
   .cg-confirmed.show { display: block; }
 
+  /* ---- anchor panel (POI landmark picker) ---- */
+  .cg-anchor-panel {
+    margin-top: 0.5rem;
+    background: var(--accent-light);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .cg-anchor-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    padding: 0.5rem 0.75rem 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .cg-anchor-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0.75rem;
+    border-top: 1px solid var(--border-light);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.12s;
+  }
+  .cg-anchor-row:hover { background: rgba(30, 58, 95, 0.08); }
+  .cg-anchor-row .anchor-name { font-weight: 500; }
+  .cg-anchor-row .anchor-meta { font-size: 0.7rem; color: var(--muted); }
+  .cg-anchor-loading {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border-light);
+  }
+
   /* ---- option card (plan results) ---- */
   .option-card {
     background: var(--card);
@@ -888,6 +924,82 @@
     container.innerHTML = "";
   }
 
+  function extractAreaContext(displayName) {
+    if (!displayName) return "";
+    var parts = displayName.split(",").map(function (s) { return s.trim(); });
+    if (parts.length >= 2) {
+      return parts.slice(-2).join(", ");
+    }
+    return displayName;
+  }
+
+  function formatDistance(m) {
+    if (m < 1000) return m + " m";
+    var km = m / 1000;
+    return (Math.round(km * 10) / 10) + " km";
+  }
+
+  function showAnchorPanel(container, confEl, candidates, cand, setSelection) {
+    var anchorPanel = document.createElement("div");
+    anchorPanel.className = "cg-anchor-panel";
+    anchorPanel.innerHTML =
+      '<div class="cg-anchor-title">Anchor to a landmark</div>' +
+      '<div class="cg-anchor-loading">Finding landmarks nearby&hellip;</div>';
+    container.innerHTML = "";
+    container.appendChild(anchorPanel);
+
+    fetch("/api/pois?lat=" + encodeURIComponent(cand.lat) + "&lon=" + encodeURIComponent(cand.lon))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.status === "ok" && data.pois && data.pois.length > 0) {
+          renderAnchorRows(anchorPanel, confEl, candidates, cand, data.pois, setSelection);
+        } else {
+          container.innerHTML = "";
+          setSelection(cand.display_name, cand.lat, cand.lon);
+          confirmSelection(confEl, cand, container);
+          updatePlanBtn();
+        }
+      })
+      .catch(function () {
+        container.innerHTML = "";
+        setSelection(cand.display_name, cand.lat, cand.lon);
+        confirmSelection(confEl, cand, container);
+        updatePlanBtn();
+      });
+  }
+
+  function renderAnchorRows(anchorPanel, confEl, candidates, cand, pois, setSelection) {
+    var loadingEl = anchorPanel.querySelector(".cg-anchor-loading");
+    if (loadingEl) loadingEl.remove();
+
+    pois.forEach(function (poi) {
+      var row = document.createElement("div");
+      row.className = "cg-anchor-row";
+      row.innerHTML =
+        '<span class="anchor-name">' + escHtml(poi.name) + ' <span class="anchor-meta">' + escHtml(poi.category) + ' &middot; ' + formatDistance(poi.distance_m) + '</span></span>';
+      row.addEventListener("click", function () {
+        var areaCtx = extractAreaContext(cand.display_name);
+        var label = poi.name + (areaCtx ? " \u00b7 " + areaCtx : "");
+        setSelection(label, poi.lat, poi.lon);
+        confEl.textContent = label;
+        confEl.classList.add("show");
+        anchorPanel.remove();
+        updatePlanBtn();
+      });
+      anchorPanel.appendChild(row);
+    });
+
+    var exactRow = document.createElement("div");
+    exactRow.className = "cg-anchor-row";
+    exactRow.innerHTML = '<span class="anchor-name">Use exact point</span>';
+    exactRow.addEventListener("click", function () {
+      setSelection(cand.display_name, cand.lat, cand.lon);
+      confirmSelection(confEl, cand, candidates);
+      updatePlanBtn();
+    });
+    anchorPanel.appendChild(exactRow);
+  }
+
   cgSearchBtn.addEventListener("click", function () {
     cgHideError();
     var originQ = cgOriginInput.value.trim();
@@ -919,8 +1031,9 @@
         if (originResult.status === "ok") {
           renderCandidates(cgOriginCands, originResult.candidates, function (c) {
             selectedOrigin = c;
-            confirmSelection(cgOriginConf, c, cgOriginCands);
-            updatePlanBtn();
+            showAnchorPanel(cgOriginCands, cgOriginConf, cgOriginCands, c, function (name, lat, lon) {
+              selectedOrigin = {display_name: name, lat: lat, lon: lon};
+            });
           });
         } else {
           cgShowError(originResult.message || "Geocoding failed for origin.");
@@ -930,8 +1043,9 @@
         if (destResult.status === "ok") {
           renderCandidates(cgDestCands, destResult.candidates, function (c) {
             selectedDest = c;
-            confirmSelection(cgDestConf, c, cgDestCands);
-            updatePlanBtn();
+            showAnchorPanel(cgDestCands, cgDestConf, cgDestCands, c, function (name, lat, lon) {
+              selectedDest = {display_name: name, lat: lat, lon: lon};
+            });
           });
         } else {
           cgShowError(destResult.message || "Geocoding failed for destination.");

@@ -30,6 +30,7 @@ import importlib
 guide_geocode = importlib.import_module("guide.geocode")  # noqa: E402
 import guide.planner as guide_planner  # noqa: E402
 import guide.feedback as guide_feedback  # noqa: E402
+import guide.pois as guide_pois  # noqa: E402
 from guide.feedback import (
     _dedupe_records,
     _calendar_day,
@@ -68,6 +69,8 @@ class FareHandler(BaseHTTPRequestHandler):
             self._serve_freshness(parsed.query)
         elif path == "/api/community":
             self._serve_community()
+        elif path == "/api/pois":
+            self._serve_pois(parsed.query)
         else:
             self._send_json(404, {"error": "Not found"})
 
@@ -338,6 +341,56 @@ class FareHandler(BaseHTTPRequestHandler):
                 "status": "error",
                 "message": "An unexpected error occurred while fetching community data.",
             })
+
+    def _serve_pois(self, query_string: str):
+        params = parse_qs(query_string)
+
+        # Validate lat (required, finite float, -90..90)
+        lat_raw = params.get("lat", [None])[0]
+        if lat_raw is None or lat_raw.strip() == "":
+            self._send_json(400, {"status": "error", "message": "Missing required parameter: lat"})
+            return
+        try:
+            lat = float(lat_raw)
+        except (ValueError, TypeError):
+            self._send_json(400, {"status": "error", "message": "Invalid latitude value: must be a number between -90 and 90."})
+            return
+        if not math.isfinite(lat) or lat < -90 or lat > 90:
+            self._send_json(400, {"status": "error", "message": "Invalid latitude value: must be a number between -90 and 90."})
+            return
+
+        # Validate lon (required, finite float, -180..180)
+        lon_raw = params.get("lon", [None])[0]
+        if lon_raw is None or lon_raw.strip() == "":
+            self._send_json(400, {"status": "error", "message": "Missing required parameter: lon"})
+            return
+        try:
+            lon = float(lon_raw)
+        except (ValueError, TypeError):
+            self._send_json(400, {"status": "error", "message": "Invalid longitude value: must be a number between -180 and 180."})
+            return
+        if not math.isfinite(lon) or lon < -180 or lon > 180:
+            self._send_json(400, {"status": "error", "message": "Invalid longitude value: must be a number between -180 and 180."})
+            return
+
+        # Validate radius (optional, default 250, clamp to 10..2000)
+        radius = 250
+        radius_raw = params.get("radius", [None])[0]
+        if radius_raw is not None and radius_raw.strip() != "":
+            try:
+                radius = int(float(radius_raw))
+            except (ValueError, TypeError):
+                self._send_json(400, {"status": "error", "message": "Invalid radius value: must be a whole number between 10 and 2000."})
+                return
+            radius = max(10, min(2000, radius))
+
+        # Call nearby_pois — never let errors bubble up
+        try:
+            pois = guide_pois.nearby_pois(lat=lat, lon=lon, radius_m=radius, limit=5)
+        except Exception:
+            pois = []
+
+        self._send_json(200, {"status": "ok", "pois": pois})
 
     def _send_json(self, code: int, body: dict):
         payload = json.dumps(body, ensure_ascii=False, default=_json_default).encode("utf-8")
