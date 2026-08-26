@@ -1,5 +1,6 @@
 """Tests for guide.pois — all HTTP mocked, no live network."""
 
+import http.client
 import json
 import importlib
 from pathlib import Path
@@ -356,3 +357,96 @@ class TestUserAgent:
         assert len(captured) >= 1
         ua = captured[0].get_header("User-agent")
         assert "ph-fares" in ua
+
+
+# ---------------------------------------------------------------------------
+# Regression tests: never-raise hardening (E9/S9.1)
+# ---------------------------------------------------------------------------
+
+class TestNeverRaiseRegression:
+    def test_bad_status_line_first_mirror_second_succeeds(self, monkeypatch):
+        """First mirror raises BadStatusLine, second succeeds → merged results."""
+        overpass_elements = [
+            {
+                "type": "node",
+                "id": 99,
+                "lat": SHAW_LAT + 0.001,
+                "lon": SHAW_LON,
+                "tags": {"name": "Regress Cafe", "amenity": "cafe"},
+            },
+        ]
+        call_count = 0
+
+        def _bad_status_urlopen(request, timeout=10):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise http.client.BadStatusLine("\\n")
+            resp = MagicMock()
+            resp.read.return_value = json.dumps(_overpass_response(overpass_elements)).encode()
+            resp.__enter__ = lambda s: s
+            resp.__exit__ = MagicMock(return_value=False)
+            return resp
+
+        monkeypatch.setattr(pois_mod, "_urlopen", _bad_status_urlopen)
+        monkeypatch.setattr(pois_mod, "OVERPASS_MIRRORS", ["https://mirror1.test", "https://mirror2.test"])
+
+        results = pois_mod.nearby_pois(SHAW_LAT, SHAW_LON, radius_m=500, limit=10)
+        names = [r["name"] for r in results]
+        assert "Regress Cafe" in names
+        assert call_count == 2
+
+    def test_overpass_returns_list_root_degrades(self, monkeypatch):
+        """Mirror returns a JSON list as root → degrade to offline results, no exception."""
+
+        def _list_root_urlopen(request, timeout=10):
+            resp = MagicMock()
+            resp.read.return_value = json.dumps([1, 2, 3]).encode()
+            resp.__enter__ = lambda s: s
+            resp.__exit__ = MagicMock(return_value=False)
+            return resp
+
+        monkeypatch.setattr(pois_mod, "_urlopen", _list_root_urlopen)
+        monkeypatch.setattr(pois_mod, "OVERPASS_MIRRORS", ["https://mirror1.test"])
+
+        results = pois_mod.nearby_pois(SHAW_LAT, SHAW_LON, radius_m=500, limit=10)
+        assert isinstance(results, list)
+        mrt = [r for r in results if r["source"] == "mrt"]
+        assert len(mrt) >= 1
+
+    def test_overpass_element_with_null_tags_skipped(self, monkeypatch):
+        """Element with tags=null is silently skipped, no exception."""
+        overpass_elements = [
+            {
+                "type": "node",
+                "id": 77,
+                "lat": SHAW_LAT + 0.001,
+                "lon": SHAW_LON,
+                "tags": None,
+            },
+            {
+                "type": "node",
+                "id": 78,
+                "lat": SHAW_LAT + 0.001,
+                "lon": SHAW_LON + 0.001,
+                "tags": {"name": "Good Cafe", "amenity": "cafe"},
+            },
+        ]
+        mock_fn, _ = _mock_urlopen_factory(_overpass_response(overpass_elements))
+        monkeypatch.setattr(pois_mod, "_urlopen", mock_fn)
+
+        results = pois_mod.nearby_pois(SHAW_LAT, SHAW_LON, radius_m=500, limit=10)
+        overpass_names = [r["name"] for r in results if r["source"] == "overpass"]
+        assert "Good Cafe" in overpass_names
+
+    def test_malformed_mrt_station_skipped(self, monkeypatch):
+        """A station dict missing 'lat' does not crash _mrt_nearby."""
+        original_stations = pois_mod._load_mrt_stations()
+        malformed = {"stop_name": "Bad Station", "lon": 121.054}  # missing lat
+        good = {"stop_name": "Good Station", "lat": 14.581, "lon": 121.054}
+        pois_mod._mrt_stations = [malformed, good] + original_stations
+
+        results = pois_mod._mrt_nearby(SHAW_LAT, SHAW_LON, radius_m=250)
+        names = [r["name"] for r in results]
+        assert "Good Station" in names
+        assert "Bad Station" not in names

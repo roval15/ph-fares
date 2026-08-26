@@ -146,8 +146,11 @@ def _mrt_nearby(lat: float, lon: float, radius_m: int) -> list[dict]:
     """Return MRT-3 stations within *radius_m* of (lat, lon)."""
     results: list[dict] = []
     for s in _load_mrt_stations():
-        slat = float(s["lat"])
-        slon = float(s["lon"])
+        try:
+            slat = float(s["lat"])
+            slon = float(s["lon"])
+        except (ValueError, KeyError, TypeError):
+            continue
         d = _haversine(lat, lon, slat, slon)
         if d <= radius_m:
             results.append(
@@ -200,7 +203,7 @@ def _parse_overpass_elements(elements: list[dict]) -> list[dict]:
     """Parse Overpass JSON elements into POI dicts (skip unnamed)."""
     results: list[dict] = []
     for el in elements:
-        tags = el.get("tags", {})
+        tags = el.get("tags") or {}
         name = tags.get("name")
         if not name or not isinstance(name, str) or not name.strip():
             continue
@@ -249,7 +252,7 @@ def _fetch_overpass(lat: float, lon: float, radius_m: int, limit: int) -> list[d
             data = json.loads(raw)
             elements = data.get("elements", [])
             return _parse_overpass_elements(elements)
-        except (OSError, urllib.error.URLError, json.JSONDecodeError, ValueError, TimeoutError) as exc:
+        except Exception as exc:
             _last_request_ts = time.monotonic()
             logger.warning("Overpass mirror %s failed: %s", mirror_url, exc)
             warnings.warn(
