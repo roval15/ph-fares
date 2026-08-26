@@ -1,0 +1,2 @@
+# ph-fares is stdlib-only — no third-party dependencies.
+# This file exists so Railway/Nixpacks detects the Python provider.
