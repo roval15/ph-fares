@@ -1992,7 +1992,8 @@
     var lat = pos.coords.latitude;
     var lon = pos.coords.longitude;
     var ts = pos.timestamp / 1000;
-    var accuracy = pos.coords.accuracy || 999;
+    var rawAccuracy = pos.coords.accuracy;
+    var accuracy = (typeof rawAccuracy === "number" && isFinite(rawAccuracy) && rawAccuracy >= 0) ? rawAccuracy : 999;
 
     trackPointCount++;
     window.__trackingState.bufferLength = trackingCore.bufferLength;
