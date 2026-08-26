@@ -6,3 +6,6 @@ __pycache__/
 
 # Tooling / orchestration
 .worktrees/
+
+# Runtime artifacts
+data/geocode_cache.json
