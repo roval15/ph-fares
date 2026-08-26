@@ -157,3 +157,52 @@ class TestPlanNoRoute:
         assert "message" in result
         assert "from" in result
         assert "to" in result
+
+
+class TestDisputedSinkSort:
+    """Disputed options sink below equal-fare clean options; cheapest-first preserved for different fares."""
+
+    def test_disputed_sinks_below_equal_fare_clean(self, monkeypatch):
+        _patch_all(monkeypatch)
+        # Monkeypatch freshness so R_DIRTY is disputed, R_CLEAN is green
+        def fake_freshness(route_id):
+            if route_id == "R_DIRTY":
+                return {"tier": "disputed", "confirmations": 0, "disputes": 3}
+            return {"tier": "green", "confirmations": 5, "disputes": 0}
+
+        monkeypatch.setattr(planner_mod, "_freshness", fake_freshness)
+
+        result = planner_mod.plan(14.5705, 121.040, 14.5795, 121.050)
+        assert result["status"] == "ok"
+
+        # If there are options with equal fare, the clean one should come first
+        # Build (fare, is_disputed) list
+        from itertools import groupby
+        fare_groups = []
+        for opt in result["options"]:
+            fare = opt["total_fare"]
+            has_disputed = any(
+                l.get("type") == "ride" and l.get("route_id") == "R_DIRTY"
+                for l in opt["legs"]
+            )
+            fare_groups.append((fare, has_disputed))
+
+        # Group by fare to check disputed sinks within each fare group
+        for fare, group in groupby(fare_groups, key=lambda x: x[0]):
+            group_list = list(group)
+            disputed_positions = [i for i, (_, d) in enumerate(group_list) if d]
+            clean_positions = [i for i, (_, d) in enumerate(group_list) if not d]
+            if disputed_positions and clean_positions:
+                assert max(disputed_positions) > min(clean_positions), \
+                    f"Disputed option should be after clean option for fare {fare}"
+
+    def test_cheapest_first_preserved_for_different_fares(self, monkeypatch):
+        _patch_all(monkeypatch)
+        def fake_freshness(route_id):
+            return {"tier": "gray", "confirmations": 0, "disputes": 0}
+        monkeypatch.setattr(planner_mod, "_freshness", fake_freshness)
+
+        result = planner_mod.plan(14.5705, 121.040, 14.5795, 121.050)
+        assert result["status"] == "ok"
+        fares = [o["total_fare"] for o in result["options"]]
+        assert fares == sorted(fares)

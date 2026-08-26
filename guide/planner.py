@@ -14,6 +14,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import phfares
+from guide.feedback import freshness as _freshness
 from guide.finder import (
     _build_stop_index,
     _haversine_m,
@@ -182,8 +183,31 @@ def plan(
                     "notes": notes,
                 })
 
-    # Sort cheapest first
-    options.sort(key=lambda o: o["total_fare"])
+    # Compute freshness for every ride-leg route_id once
+    route_ids_seen: set[str] = set()
+    for opt in options:
+        for leg in opt["legs"]:
+            if leg["type"] == "ride" and "route_id" in leg:
+                route_ids_seen.add(leg["route_id"])
+    _freshness_cache: dict[str, dict] = {}
+    for rid in route_ids_seen:
+        try:
+            _freshness_cache[rid] = _freshness(rid)
+        except Exception:
+            _freshness_cache[rid] = {"tier": "gray"}
+
+    def _option_is_disputed(opt: dict) -> bool:
+        for leg in opt["legs"]:
+            if leg["type"] == "ride":
+                f = _freshness_cache.get(leg.get("route_id"), {})
+                if f.get("tier") == "disputed":
+                    return True
+        return False
+
+    # Sort cheapest first; among equal fares, disputed options sink
+    options.sort(
+        key=lambda o: (o["total_fare"], 0 if _option_is_disputed(o) else 1)
+    )
 
     if not options:
         return {

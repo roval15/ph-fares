@@ -29,6 +29,13 @@ from phfares import fare  # noqa: E402
 import importlib
 guide_geocode = importlib.import_module("guide.geocode")  # noqa: E402
 import guide.planner as guide_planner  # noqa: E402
+import guide.feedback as guide_feedback  # noqa: E402
+from guide.feedback import (
+    _dedupe_records,
+    _calendar_day,
+    _VALID_KINDS,
+    freshness as feedback_freshness,
+)  # noqa: E402
 
 _HTML_PATH = Path(__file__).resolve().parent / "index.html"
 
@@ -57,6 +64,19 @@ class FareHandler(BaseHTTPRequestHandler):
             self._serve_geocode(parsed.query)
         elif path == "/api/plan":
             self._serve_plan(parsed.query)
+        elif path == "/api/freshness":
+            self._serve_freshness(parsed.query)
+        elif path == "/api/community":
+            self._serve_community()
+        else:
+            self._send_json(404, {"error": "Not found"})
+
+    def do_POST(self):
+        parsed = urlparse(self.path)
+        path = parsed.path
+
+        if path == "/api/feedback":
+            self._serve_feedback_post()
         else:
             self._send_json(404, {"error": "Not found"})
 
@@ -178,7 +198,146 @@ class FareHandler(BaseHTTPRequestHandler):
             )
             return
 
+        if result.get("status") == "ok":
+            route_freshness: dict[str, dict] = {}
+            route_ids_seen: set[str] = set()
+            for opt in result.get("options", []):
+                for leg in opt.get("legs", []):
+                    if leg.get("type") == "ride" and "route_id" in leg:
+                        route_ids_seen.add(leg["route_id"])
+            for rid in route_ids_seen:
+                try:
+                    f = feedback_freshness(rid)
+                    route_freshness[rid] = {
+                        "tier": f["tier"],
+                        "confirmations": f["confirmations"],
+                        "disputes": f["disputes"],
+                    }
+                except Exception:
+                    route_freshness[rid] = {"tier": "gray", "confirmations": 0, "disputes": 0}
+            result["route_freshness"] = route_freshness
+
         self._send_json(200, result)
+
+    def _serve_feedback_post(self):
+        content_length_raw = self.headers.get("Content-Length")
+        if content_length_raw is None:
+            self._send_json(400, {"status": "error", "message": "Missing Content-Length header."})
+            return
+        try:
+            content_length = int(content_length_raw)
+        except (ValueError, TypeError):
+            self._send_json(400, {"status": "error", "message": "Invalid Content-Length."})
+            return
+        if content_length > 10240:
+            self._send_json(400, {"status": "error", "message": "Request body too large (max 10 KB)."})
+            return
+        try:
+            body_bytes = self.rfile.read(content_length)
+        except Exception:
+            self._send_json(400, {"status": "error", "message": "Failed to read request body."})
+            return
+        try:
+            body = json.loads(body_bytes)
+        except (json.JSONDecodeError, ValueError):
+            self._send_json(400, {"status": "error", "message": "Invalid JSON in request body."})
+            return
+        if not isinstance(body, dict):
+            self._send_json(400, {"status": "error", "message": "Request body must be a JSON object."})
+            return
+
+        route_id = body.get("route_id")
+        kind = body.get("kind")
+        alias = body.get("alias") or None
+        note = body.get("note") or None
+
+        if not route_id or not isinstance(route_id, str) or not route_id.strip():
+            self._send_json(400, {
+                "status": "error",
+                "message": "Missing or empty 'route_id'. Please specify which route you are reporting on.",
+            })
+            return
+
+        if kind not in _VALID_KINDS:
+            self._send_json(400, {
+                "status": "error",
+                "message": f"Invalid kind {kind!r}. Must be one of: confirm, dispute, note.",
+            })
+            return
+
+        try:
+            guide_feedback.append_feedback(route_id, kind, alias=alias, note=note)
+            f = feedback_freshness(route_id)
+            self._send_json(200, {"ok": True, "freshness": f})
+        except Exception as exc:
+            self._send_json(500, {
+                "status": "error",
+                "message": "An unexpected error occurred while saving your feedback.",
+            })
+
+    def _serve_freshness(self, query_string: str):
+        params = parse_qs(query_string)
+        route_id = params.get("route_id", [None])[0]
+        if not route_id or not route_id.strip():
+            self._send_json(400, {
+                "status": "error",
+                "message": "Missing required parameter: route_id",
+            })
+            return
+        try:
+            f = feedback_freshness(route_id.strip())
+            self._send_json(200, f)
+        except Exception:
+            self._send_json(500, {
+                "status": "error",
+                "message": "An unexpected error occurred while fetching freshness.",
+            })
+
+    def _serve_community(self):
+        try:
+            records = guide_feedback.load_feedback()
+            deduped = _dedupe_records(records)
+
+            # Count total reports (all deduped kinds)
+            total_reports = len(deduped)
+
+            # Group by route_id
+            route_map: dict[str, list[dict]] = {}
+            for r in deduped:
+                rid = r["route_id"]
+                route_map.setdefault(rid, []).append(r)
+
+            corridors = []
+            for rid, r_records in route_map.items():
+                confirms = [r for r in r_records if r["kind"] == "confirm"]
+                alias_counts: dict[str, int] = {}
+                for r in confirms:
+                    alias = (r.get("alias") or "").strip()
+                    if not alias:
+                        continue
+                    alias_counts[alias] = alias_counts.get(alias, 0) + 1
+                top_stewards = sorted(
+                    [{"alias": a, "confirmations": c} for a, c in alias_counts.items()],
+                    key=lambda s: (-s["confirmations"], s["alias"]),
+                )[:3]
+                corridors.append({
+                    "route_id": rid,
+                    "route_long_name": None,
+                    "report_count": len(r_records),
+                    "top_stewards": top_stewards,
+                })
+
+            corridors.sort(key=lambda c: -c["report_count"])
+
+            self._send_json(200, {
+                "total_reports": total_reports,
+                "corridors": corridors,
+            })
+        except Exception:
+            self._send_json(500, {
+                "status": "error",
+                "message": "An unexpected error occurred while fetching community data.",
+            })
 
     def _send_json(self, code: int, body: dict):
         payload = json.dumps(body, ensure_ascii=False, default=_json_default).encode("utf-8")

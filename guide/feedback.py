@@ -215,7 +215,7 @@ def freshness(route_id: str) -> dict:
     # --- Windows (30 days and 90 days) ---
     def _within(dt_str: str, days: int) -> bool:
         rec_time = datetime.fromisoformat(dt_str).astimezone(timezone.utc)
-        return (now - rec_time).days < days
+        return (now - rec_time).days <= days
 
     confirms_30 = [r for r in confirms if _within(r["ts"], 30)]
     disputes_30 = [r for r in disputes if _within(r["ts"], 30)]

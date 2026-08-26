@@ -392,6 +392,156 @@
     line-height: 1.6;
   }
   footer a { color: var(--accent); text-decoration: none; }
+
+  /* ---- freshness chips ---- */
+  .chip {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.12rem 0.5rem;
+    border-radius: 999px;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .chip-green { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+  .chip-yellow { background: #fffbeb; color: #b45309; border: 1px solid #fbbf24; }
+  .chip-gray { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+  .chip-disputed { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+  /* ---- feedback prompt ---- */
+  .feedback-prompt {
+    margin-top: 1.25rem;
+    padding: 0.875rem;
+    background: var(--accent-light);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+  }
+  .feedback-prompt h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .feedback-route-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    margin-bottom: 0.35rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: border-color 0.15s;
+  }
+  .feedback-route-row:hover { border-color: var(--accent); }
+  .feedback-route-row .route-name { flex: 1; font-weight: 500; }
+  .feedback-actions {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+    flex-wrap: wrap;
+  }
+  .feedback-actions button {
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .feedback-actions button:hover { border-color: var(--accent); background: var(--accent-light); }
+  .feedback-note-input {
+    width: 100%;
+    margin-top: 0.35rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    resize: vertical;
+    min-height: 2.5rem;
+  }
+  .feedback-note-submit {
+    margin-top: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .alias-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+  }
+  .alias-row label { color: var(--muted); white-space: nowrap; }
+  .alias-row input {
+    flex: 1;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+  }
+  .feedback-inline-error {
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    color: #b91c1c;
+  }
+
+  /* ---- toast ---- */
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    font-weight: 500;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ---- community strip ---- */
+  .community-strip {
+    margin-top: 1.5rem;
+    padding: 0.875rem;
+    background: var(--card);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+  }
+  .community-strip h4 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+  .community-strip .strip-stat {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .community-strip .steward-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .community-strip .steward-row .steward-name { color: var(--text); font-weight: 500; }
 </style>
 </head>
 <body>
@@ -440,6 +590,10 @@
     <div class="label">Route options</div>
     <div id="cg-results" class="results"></div>
   </section>
+
+  <div id="cg-feedback-prompt"></div>
+
+  <div id="cg-community-strip" class="community-strip" style="display:none;"></div>
 
 </main>
 
@@ -687,9 +841,13 @@
   var cgDestCands     = document.getElementById("cg-dest-candidates");
   var cgDestConf      = document.getElementById("cg-dest-confirmed");
   var cgResults       = document.getElementById("cg-results");
+  var cgFeedbackPrompt = document.getElementById("cg-feedback-prompt");
+  var cgCommunityStrip = document.getElementById("cg-community-strip");
 
   var selectedOrigin = null;  // {display_name, lat, lon}
   var selectedDest   = null;
+  var lastRouteFreshness = {};
+  var lastPlanOptions = [];
 
   function cgShowError(msg) {
     cgError.textContent = msg;
@@ -804,6 +962,7 @@
 
     cgHideError();
     cgResults.innerHTML = '<div class="loading">Planning trip&hellip;</div>';
+    cgFeedbackPrompt.innerHTML = "";
     cgPlanBtn.disabled = true;
 
     var url = "/api/plan?from_lat=" + encodeURIComponent(selectedOrigin.lat) +
@@ -816,17 +975,24 @@
       .then(function (data) {
         cgPlanBtn.disabled = false;
         if (data.status === "ok") {
-          renderPlanResults(data.options);
+          lastPlanOptions = data.options;
+          lastRouteFreshness = data.route_freshness || {};
+          renderPlanResults(data.options, lastRouteFreshness);
+          renderFeedbackPrompt(data.options);
+          fetchCommunityStrip();
         } else if (data.status === "no_route") {
           cgResults.innerHTML =
             '<div class="mode-unavailable">No direct route found between these points yet. Try points closer to Mandaluyong routes or the MRT-3 line.</div>';
+          cgFeedbackPrompt.innerHTML = "";
         } else {
           cgResults.innerHTML = '<div class="mode-unavailable">' + escHtml(data.message || "Something went wrong planning your trip.") + '</div>';
+          cgFeedbackPrompt.innerHTML = "";
         }
       })
       .catch(function () {
         cgPlanBtn.disabled = false;
         cgResults.innerHTML = '<div class="mode-unavailable">Network error while planning. Please check your connection and try again.</div>';
+        cgFeedbackPrompt.innerHTML = "";
       });
   });
 
@@ -836,7 +1002,35 @@
     "mrt3": "MRT-3"
   };
 
-  function renderPlanResults(options) {
+  function getChipHtml(routeFreshness, legs) {
+    var rideLegs = (legs || []).filter(function (l) { return l.type === "ride"; });
+    if (rideLegs.length === 0) return "";
+    var primaryLeg = rideLegs[0];
+    var fid = primaryLeg.route_id;
+    var f = routeFreshness[fid];
+    if (!f) return '<span class="chip chip-gray">Unverified (2017 data)</span>';
+    var tier = f.tier;
+    if (tier === "green") {
+      var text = "Verified by " + f.confirmations + " commuters";
+      if (f.last_confirmed) {
+        var lastTs = new Date(f.last_confirmed);
+        var now = new Date();
+        var daysDiff = Math.floor((now - lastTs) / 86400000);
+        if (daysDiff === 0) { text += " \u00b7 today"; }
+        else { text += " \u00b7 " + daysDiff + "d ago"; }
+      }
+      return '<span class="chip chip-green">' + escHtml(text) + '</span>';
+    }
+    if (tier === "yellow") {
+      return '<span class="chip chip-yellow">Recently confirmed</span>';
+    }
+    if (tier === "disputed") {
+      return '<span class="chip chip-disputed">\u26a0 Reported issues</span>';
+    }
+    return '<span class="chip chip-gray">Unverified (2017 data)</span>';
+  }
+
+  function renderPlanResults(options, routeFreshness) {
     if (!options || options.length === 0) {
       cgResults.innerHTML = '<div class="mode-unavailable">No route options found.</div>';
       return;
@@ -867,6 +1061,7 @@
       var h = '<div class="' + cardCls + '">';
       h += '<div class="option-header">';
       h += '<div class="option-total">\u20b1' + formatFare(fare) + badge + '</div>';
+      h += getChipHtml(routeFreshness, opt.legs);
       h += '</div>';
 
       if (opt.legs) {
@@ -945,7 +1140,216 @@
     }
   }
 
+  /* ================================================================
+     TOAST
+     ================================================================ */
+
+  function showToast(msg) {
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    setTimeout(function () { el.classList.remove("show"); }, 3000);
+  }
+
+  /* ================================================================
+     FEEDBACK PROMPT
+     ================================================================ */
+
+  function getAlias() {
+    return localStorage.getItem("phfares_alias") || "";
+  }
+
+  function setAlias(a) {
+    localStorage.setItem("phfares_alias", a);
+  }
+
+  function renderFeedbackPrompt(options) {
+    if (!options || options.length === 0) {
+      cgFeedbackPrompt.innerHTML = "";
+      return;
+    }
+
+    var aliasValue = getAlias();
+    var aliasShown = aliasValue !== "";
+
+    function buildHtml() {
+      var h = '<div class="feedback-prompt">';
+      h += '<h3>Help the next commuter — did this route actually run today?</h3>';
+
+      if (!aliasShown) {
+        h += '<div class="alias-row" id="alias-row">';
+        h += '<label for="alias-input">Your alias (optional):</label>';
+        h += '<input type="text" id="alias-input" placeholder="e.g. Maria" maxlength="40">';
+        h += '</div>';
+      }
+
+      options.forEach(function (opt, idx) {
+        var rideLeg = null;
+        if (opt.legs) {
+          for (var i = 0; i < opt.legs.length; i++) {
+            if (opt.legs[i].type === "ride") { rideLeg = opt.legs[i]; break; }
+          }
+        }
+        if (!rideLeg) return;
+        var modeLabel = MODE_LABELS[rideLeg.mode] || rideLeg.mode;
+        var fare = typeof opt.total_fare === "number" ? opt.total_fare : parseFloat(opt.total_fare);
+        var chip = getChipHtml(lastRouteFreshness, opt.legs);
+        var routeId = rideLeg.route_id;
+
+        h += '<div class="feedback-route-row" data-route-id="' + escHtml(routeId) + '">';
+        h += '<span class="route-name">' + escHtml(rideLeg.route_long_name || modeLabel) + '</span>';
+        h += '<span>\u20b1' + formatFare(fare) + '</span>';
+        h += chip;
+        h += '</div>';
+        h += '<div class="feedback-actions" id="feedback-actions-' + escHtml(routeId) + '" style="display:none;">';
+        h += '<button data-kind="confirm" data-route="' + escHtml(routeId) + '">\ud83d\udc4d Still runs</button>';
+        h += '<button data-kind="dispute" data-route="' + escHtml(routeId) + '">\ud83d\udc4e Gone or changed</button>';
+        h += '<button data-kind="note" data-route="' + escHtml(routeId) + '">\u270f\ufe0f Quick note</button>';
+        h += '<div id="note-area-' + escHtml(routeId) + '" style="display:none;">';
+        h += '<textarea class="feedback-note-input" id="note-input-' + escHtml(routeId) + '" placeholder="Your note..."></textarea>';
+        h += '<button class="feedback-note-submit" data-route="' + escHtml(routeId) + '">Send note</button>';
+        h += '</div>';
+        h += '<div class="feedback-inline-error" id="feedback-error-' + escHtml(routeId) + '"></div>';
+        h += '</div>';
+      });
+
+      h += '</div>';
+      return h;
+    }
+
+    cgFeedbackPrompt.innerHTML = buildHtml();
+
+    // If alias not yet captured, capture on first feedback post
+    var routeRows = cgFeedbackPrompt.querySelectorAll(".feedback-route-row");
+    routeRows.forEach(function (row) {
+      row.addEventListener("click", function () {
+        var rid = row.getAttribute("data-route-id");
+        var actionsEl = document.getElementById("feedback-actions-" + rid);
+        if (!actionsEl) return;
+        var isVisible = actionsEl.style.display !== "none";
+        // hide all others
+        cgFeedbackPrompt.querySelectorAll(".feedback-actions").forEach(function (a) {
+          a.style.display = "none";
+        });
+        cgFeedbackPrompt.querySelectorAll("[id^=note-area-]").forEach(function (a) {
+          a.style.display = "none";
+        });
+        if (!isVisible) {
+          actionsEl.style.display = "flex";
+        }
+      });
+    });
+
+    // Confirm / Dispute buttons
+    cgFeedbackPrompt.querySelectorAll("[data-kind=confirm], [data-kind=dispute]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var rid = btn.getAttribute("data-route");
+        var kind = btn.getAttribute("data-kind");
+        doFeedbackPost(rid, kind, null);
+      });
+    });
+
+    // Note buttons
+    cgFeedbackPrompt.querySelectorAll("[data-kind=note]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var rid = btn.getAttribute("data-route");
+        var noteArea = document.getElementById("note-area-" + rid);
+        if (noteArea) noteArea.style.display = noteArea.style.display === "none" ? "block" : "none";
+      });
+    });
+
+    // Note submit buttons
+    cgFeedbackPrompt.querySelectorAll(".feedback-note-submit").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var rid = btn.getAttribute("data-route");
+        var input = document.getElementById("note-input-" + rid);
+        var note = input ? input.value.trim() : "";
+        doFeedbackPost(rid, "note", note || null);
+      });
+    });
+  }
+
+  function doFeedbackPost(routeId, kind, note) {
+    var alias = getAlias();
+    if (!alias) {
+      var aliasInput = document.getElementById("alias-input");
+      if (aliasInput) {
+        alias = aliasInput.value.trim() || null;
+        if (alias) setAlias(alias);
+      }
+    }
+
+    var payload = { route_id: routeId, kind: kind };
+    if (alias) payload.alias = alias;
+    if (note) payload.note = note;
+
+    var errEl = document.getElementById("feedback-error-" + routeId);
+
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.ok) {
+          showToast("Salamat! Your report helps future commuters.");
+          if (errEl) errEl.textContent = "";
+          // Refresh the prompt and community strip
+          renderFeedbackPrompt(lastPlanOptions);
+          fetchCommunityStrip();
+        } else {
+          if (errEl) errEl.textContent = data.message || "Something went wrong. Please try again.";
+        }
+      })
+      .catch(function () {
+        if (errEl) errEl.textContent = "Network error. Please check your connection.";
+      });
+  }
+
+  /* ================================================================
+     COMMUNITY STRIP
+     ================================================================ */
+
+  function fetchCommunityStrip() {
+    fetch("/api/community")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        renderCommunityStrip(data);
+      })
+      .catch(function () {
+        cgCommunityStrip.style.display = "none";
+      });
+  }
+
+  function renderCommunityStrip(data) {
+    if (!data || !data.corridors) {
+      cgCommunityStrip.style.display = "none";
+      return;
+    }
+    var h = '<h4>Community Reports</h4>';
+    h += '<div>Total reports: <span class="strip-stat">' + (data.total_reports || 0) + '</span></div>';
+
+    if (data.corridors.length > 0) {
+      data.corridors.forEach(function (c) {
+        var name = c.route_long_name || c.route_id;
+        h += '<div style="margin-top:0.4rem; font-size:0.75rem;">';
+        h += '<strong>' + escHtml(name) + '</strong>';
+        if (c.top_stewards && c.top_stewards.length > 0) {
+          c.top_stewards.forEach(function (s) {
+            h += '<div class="steward-row"><span class="steward-name">' + escHtml(s.alias) + '</span><span>' + s.confirmations + ' confirms</span></div>';
+          });
+        }
+        h += '</div>';
+      });
+    }
+
+    cgCommunityStrip.innerHTML = h;
+    cgCommunityStrip.style.display = "block";
+  }
+
 })();
 </script>
+<div class="toast" id="toast"></div>
 </body>
 </html>

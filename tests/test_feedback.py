@@ -383,3 +383,31 @@ class TestTierPrecedence:
             fb_mod.append_feedback("R1", "confirm", fingerprint=f"fp{i}", alias=f"u{i}")
         result = fb_mod.freshness("R1")
         assert result["tier"] == "green"
+
+
+# ---------------------------------------------------------------------------
+# Boundary tests (QA-requested): 90d exact -> yellow, 91d -> gray
+# ---------------------------------------------------------------------------
+
+class TestFreshnessBoundary:
+    def test_exactly_90_day_old_confirm_is_yellow(self, monkeypatch):
+        """A confirm dated exactly 90 days ago should be yellow (not gray)."""
+        now = datetime(2026, 8, 26, 12, 0, tzinfo=timezone.utc)
+        from datetime import timedelta
+        past = now - timedelta(days=90)
+        monkeypatch.setattr(fb_mod, "_now", _fake_now(past))
+        fb_mod.append_feedback("R1", "confirm", fingerprint="fp1", alias="u1")
+        monkeypatch.setattr(fb_mod, "_now", _fake_now(now))
+        result = fb_mod.freshness("R1")
+        assert result["tier"] == "yellow"
+
+    def test_91_day_old_confirm_is_gray(self, monkeypatch):
+        """A confirm dated 91 days ago should be gray."""
+        now = datetime(2026, 8, 26, 12, 0, tzinfo=timezone.utc)
+        from datetime import timedelta
+        past = now - timedelta(days=91)
+        monkeypatch.setattr(fb_mod, "_now", _fake_now(past))
+        fb_mod.append_feedback("R1", "confirm", fingerprint="fp1", alias="u1")
+        monkeypatch.setattr(fb_mod, "_now", _fake_now(now))
+        result = fb_mod.freshness("R1")
+        assert result["tier"] == "gray"
