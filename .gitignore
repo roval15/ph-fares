@@ -9,3 +9,4 @@ __pycache__/
 
 # Runtime artifacts
 data/geocode_cache.json
+data/poi_cache.json
