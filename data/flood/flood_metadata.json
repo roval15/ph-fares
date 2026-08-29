@@ -1,0 +1,28 @@
+{
+  "source": "Project NOAH (UP Resilience Institute)",
+  "dataset": "Metro Manila 100yr flood hazard",
+  "source_url": "https://drive.google.com/drive/folders/1ALE4-E9c-4AGjm1fqiPprWHrLUskeY9o",
+  "license": "ODC-ODbL-1.0",
+  "as_of": "2024-08-24",
+  "built_at": "2026-08-29T09:48:08+00:00",
+  "build_script_sha256": "0b16e42a4b09e3b3b7071195df12b108c40b1e192affb96f2765e66ffc796ddc",
+  "bbox": [
+    120.90673880071594,
+    14.351790725957223,
+    121.13503641400004,
+    14.784375978796906
+  ],
+  "cell_deg": [
+    0.0001856303556815927,
+    0.00018087434659142294
+  ],
+  "shape": [
+    2392,
+    1230
+  ],
+  "levels": {
+    "1": "LOW",
+    "2": "MEDIUM",
+    "3": "HIGH"
+  }
+}
