@@ -444,6 +444,87 @@
   .chip-yellow { background: #fffbeb; color: #b45309; border: 1px solid #fbbf24; }
   .chip-gray { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
   .chip-disputed { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+  .chip-none { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+  .chip-low { background: #fffbeb; color: #a16207; border: 1px solid #fbbf24; }
+  .chip-med { background: #fff7ed; color: #c2410c; border: 1px solid #fb923c; }
+  .chip-high { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+  /* ---- flood risk ---- */
+  .flood-check-btn {
+    display: block;
+    width: 100%;
+    margin-top: 0.7rem;
+    padding: 0.6rem 0.75rem;
+    background: transparent;
+    color: var(--accent);
+    border: 2px dashed var(--accent);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .flood-check-btn:hover { background: var(--accent-light); }
+  .flood\-panel {
+    margin-top: 0.7rem;
+    background: var(--card);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .flood\-panel-title {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .flood\-panel-title .asof {
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .flood-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--border-light);
+    font-size: 0.75rem;
+  }
+  .flood-row .fr-fare { color: var(--muted); font-size: 0.7rem; }
+  .flood-row .fr-opt { font-weight: 500; font-size: 0.76rem; color: var(--text); }
+  .flood-reasons {
+    padding: 0.45rem 0.75rem 0.55rem;
+    border-top: 1px solid var(--border-light);
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: #fafaf7;
+  }
+  .flood-reasons b { color: var(--text); }
+  .flood-attrib {
+    padding: 0.35rem 0.75rem 0.5rem;
+    font-size: 0.6rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border-light);
+  }
+  .flood-ends-warn {
+    display: inline-block;
+    margin-top: 0.35rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    padding: 0.1rem 0.4rem;
+  }
 
   /* ---- feedback prompt ---- */
   .feedback-prompt {
@@ -885,6 +966,18 @@
   var lastRouteFreshness = {};
   var lastPlanOptions = [];
 
+  function resetFloodUI() {
+    var btn = document.getElementById("cg-flood-btn");
+    if (btn) btn.remove();
+    var panel = document.getElementById("cg-flood-panel");
+    if (panel) panel.remove();
+    if (cgResults) {
+      cgResults.querySelectorAll(".flood-ends-warn").forEach(function (el) {
+        el.remove();
+      });
+    }
+  }
+
   function cgShowError(msg) {
     cgError.textContent = msg;
     cgError.classList.add("show");
@@ -1013,6 +1106,7 @@
     cgSearchBtn.disabled = true;
     cgSearchBtn.textContent = "Searching\u2026";
     cgResults.innerHTML = "";
+    resetFloodUI();
     selectedOrigin = null;
     selectedDest = null;
     updatePlanBtn();
@@ -1074,6 +1168,7 @@
   cgPlanBtn.addEventListener("click", function () {
     if (!selectedOrigin || !selectedDest) return;
 
+    resetFloodUI();
     cgHideError();
     cgResults.innerHTML = '<div class="loading">Planning trip&hellip;</div>';
     cgFeedbackPrompt.innerHTML = "";
@@ -1094,6 +1189,13 @@
           renderPlanResults(data.options, lastRouteFreshness);
           renderFeedbackPrompt(data.options);
           fetchCommunityStrip();
+          if (data.options && data.options.length > 0) {
+            cgResults.insertAdjacentHTML("afterend", '<button type="button" class="flood-check-btn" id="cg-flood-btn">\ud83c\udf27\ufe0f Check flood risk for this trip</button>');
+            var floodBtn = document.getElementById("cg-flood-btn");
+            if (floodBtn) {
+              floodBtn.addEventListener("click", function () { runFloodCheck(floodBtn); });
+            }
+          }
         } else if (data.status === "no_route") {
           cgResults.innerHTML =
             '<div class="mode-unavailable">No direct route found between these points yet. Try points closer to Mandaluyong routes or the MRT-3 line.</div>';
@@ -1252,6 +1354,144 @@
         }
       });
     }
+  }
+
+  /* ================================================================
+     FLOOD RISK
+     ================================================================ */
+
+  function getVerdictChipClass(verdict) {
+    var v = (verdict || "").toUpperCase();
+    if (v === "LOW") return "chip-low";
+    if (v === "MEDIUM") return "chip-med";
+    if (v === "HIGH") return "chip-high";
+    return "chip-none";
+  }
+
+  function buildFloodOptionLabel(modes, idx) {
+    if (!modes || modes.length === 0) return "Route " + (idx + 1);
+    var labels = modes.map(function (m) {
+      return MODE_LABELS[m] || m;
+    });
+    return labels.join(" + ");
+  }
+
+  function formatAsOf(asOf) {
+    if (!asOf) return "";
+    var d = new Date(asOf);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+
+  function buildWhyText(options) {
+    if (!options || options.length === 0) return "";
+    var top = options[0];
+    for (var i = 1; i < options.length; i++) {
+      if (options[i].level > top.level) top = options[i];
+    }
+    var reasons = top.reasons || [];
+    var text = "";
+    if (reasons.length > 0) {
+      var joined = reasons.join("; ");
+      text = joined.charAt(0).toUpperCase() + joined.slice(1);
+      if (text.charAt(text.length - 1) !== ".") text += ".";
+    }
+    return text;
+  }
+
+  function renderFloodPanel(data, panel) {
+    var opts = (data.options || []).slice(0, 3);
+
+    var asofHtml = "";
+    var asofText = formatAsOf(data.as_of);
+    if (asofText !== "") {
+      asofHtml = '<span class="asof">checked ' + asofText + '</span>';
+    }
+
+    var rowsHtml = "";
+    opts.forEach(function (opt, i) {
+      var label = buildFloodOptionLabel(opt.modes, i);
+      var fareHtml = '<span class="fr-fare">\u20b1' + formatFare(opt.fare) + '</span>';
+      var chipClass = getVerdictChipClass(opt.verdict);
+      var chipHtml = '<span class="chip ' + chipClass + '">' + escHtml(opt.verdict) + '</span>';
+      rowsHtml += '<div class="flood-row"><span class="fr-opt">' + escHtml(label) + '</span>' +
+        '<span class="fr-right">' + fareHtml + ' ' + chipHtml + '</span></div>';
+    });
+
+    var whyHtml = "";
+    var whyText = buildWhyText(data.options || []);
+    if (whyText !== "") {
+      whyHtml = '<div class="flood-reasons"><b>Why:</b> ' + escHtml(whyText);
+      if (data.weather && data.weather.available === false) {
+        whyHtml += '<br>Live rain unavailable &mdash; showing mapped flood zones only.';
+      }
+      whyHtml += '</div>';
+    } else if (data.weather && data.weather.available === false) {
+      whyHtml = '<div class="flood-reasons">Live rain unavailable &mdash; showing mapped flood zones only.</div>';
+    }
+
+    var attribHtml = (data.attribution && data.attribution !== "")
+      ? '<div class="flood-attrib">' + escHtml(data.attribution) + '</div>'
+      : "";
+
+    panel.innerHTML =
+      '<div class="flood-panel-title">\ud83c\udf27\ufe0f Flood risk' + asofHtml + '</div>' +
+      rowsHtml +
+      whyHtml +
+      attribHtml;
+
+    var cards = cgResults.querySelectorAll(".option-card");
+    (data.options || []).forEach(function (opt, i) {
+      if (i < data.options.length && i < cards.length) {
+        var v = (opt.verdict || "").toUpperCase();
+        if (v === "MEDIUM" || v === "HIGH") {
+          var card = cards[i];
+          if (!card.querySelector(".flood-ends-warn")) {
+            card.insertAdjacentHTML("beforeend", '<div class="flood-ends-warn">\u26a0 ends in flood area</div>');
+          }
+        }
+      }
+    });
+  }
+
+  function runFloodCheck(btn) {
+    if (!selectedOrigin || !selectedDest) return;
+    if (btn) btn.remove();
+
+    var panel = document.createElement("div");
+    panel.className = "flood-panel";
+    panel.id = "cg-flood-panel";
+    panel.innerHTML =
+      '<div class="flood-panel-title">\ud83c\udf27\ufe0f Flood risk <span class="asof">Checking flood risk&hellip;</span></div>';
+
+    cgResults.closest("section").insertAdjacentHTML("beforebegin", panel.outerHTML);
+    panel = document.getElementById("cg-flood-panel");
+
+    var url = "/api/flood-risk?from_lat=" + encodeURIComponent(selectedOrigin.lat) +
+              "&from_lon=" + encodeURIComponent(selectedOrigin.lon) +
+              "&to_lat=" + encodeURIComponent(selectedDest.lat) +
+              "&to_lon=" + encodeURIComponent(selectedDest.lon);
+
+    fetch(url)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.status === "ok") {
+          renderFloodPanel(data, panel);
+        } else if (data.status === "no_route") {
+          panel.innerHTML =
+            '<div class="flood-panel-title">\ud83c\udf27\ufe0f Flood risk</div>' +
+            '<div class="flood-row">No route found &mdash; flood check unavailable for this trip.</div>';
+        } else {
+          panel.innerHTML =
+            '<div class="flood-panel-title">\ud83c\udf27\ufe0f Flood risk</div>' +
+            '<div class="flood-row">Flood check unavailable right now. Try again later.</div>';
+        }
+      })
+      .catch(function () {
+        panel.innerHTML =
+          '<div class="flood-panel-title">\ud83c\udf27\ufe0f Flood risk</div>' +
+          '<div class="flood-row">Flood check unavailable right now. Try again later.</div>';
+      });
   }
 
   /* ================================================================
