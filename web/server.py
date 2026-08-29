@@ -12,6 +12,7 @@ import math
 import os
 import sys
 import urllib.error
+from datetime import datetime, timezone
 from decimal import Decimal
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -25,6 +26,7 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from phfares import fare  # noqa: E402
+from phfares import flood  # noqa: E402
 
 import importlib
 guide_geocode = importlib.import_module("guide.geocode")  # noqa: E402
@@ -71,6 +73,8 @@ class FareHandler(BaseHTTPRequestHandler):
             self._serve_community()
         elif path == "/api/pois":
             self._serve_pois(parsed.query)
+        elif path == "/api/flood-risk":
+            self._serve_flood_risk(parsed.query)
         else:
             self._send_json(404, {"error": "Not found"})
 
@@ -391,6 +395,98 @@ class FareHandler(BaseHTTPRequestHandler):
             pois = []
 
         self._send_json(200, {"status": "ok", "pois": pois})
+
+    def _serve_flood_risk(self, query_string: str):
+        params = parse_qs(query_string)
+        errors = []
+        for name in ("from_lat", "from_lon", "to_lat", "to_lon"):
+            raw = params.get(name, [None])[0]
+            if raw is None or raw.strip() == "":
+                errors.append(f"Missing required parameter: {name}")
+                continue
+            try:
+                val = float(raw)
+                if not math.isfinite(val):
+                    errors.append(f"Parameter {name} must be a finite number, got '{raw}'")
+            except (ValueError, TypeError):
+                errors.append(f"Parameter {name} is not a valid number: '{raw}'")
+
+        if errors:
+            self._send_json(400, {"status": "error", "message": "; ".join(errors)})
+            return
+
+        from_lat = float(params["from_lat"][0])
+        from_lon = float(params["from_lon"][0])
+        to_lat = float(params["to_lat"][0])
+        to_lon = float(params["to_lon"][0])
+
+        try:
+            plan_result = guide_planner.plan(from_lat, from_lon, to_lat, to_lon)
+        except Exception:
+            self._send_json(
+                500,
+                {"status": "error", "message": "An unexpected error occurred while planning your trip."},
+            )
+            return
+
+        if plan_result.get("status") != "ok" or not plan_result.get("options"):
+            self._send_json(200, {
+                "status": "no_route",
+                "message": plan_result.get(
+                    "message", "No direct route found between the given points."
+                ),
+                "from": plan_result.get("from", {"lat": from_lat, "lon": from_lon}),
+                "to": plan_result.get("to", {"lat": to_lat, "lon": to_lon}),
+            })
+            return
+
+        # Options are already sorted cheapest-first; cap at 5.
+        options = plan_result["options"][:5]
+
+        try:
+            grid = flood.load_grid()
+        except Exception:
+            self._send_json(
+                500,
+                {"status": "error", "message": "Flood grid unavailable."},
+            )
+            return
+
+        mid_lat = (from_lat + to_lat) / 2.0
+        mid_lon = (from_lon + to_lon) / 2.0
+        weather = flood.fetch_weather(mid_lat, mid_lon)
+
+        out_options = []
+        for opt in options:
+            exposure = flood.route_exposure(grid, opt.get("legs", []))
+            verdict = flood.assess(exposure["exposure"], weather)
+            modes = sorted({
+                leg.get("mode") for leg in opt.get("legs", [])
+                if leg.get("type") == "ride" and leg.get("mode")
+            })
+            out_options.append({
+                "fare": float(opt["total_fare"]),
+                "modes": modes,
+                "exposure": dict(exposure["exposure"]),
+                "samples": exposure["samples"],
+                "verdict": verdict["verdict"],
+                "level": verdict["level"],
+                "reasons": verdict["reasons"],
+                "pct_in_zone": verdict["pct_in_zone"],
+            })
+
+        as_of = weather.get("as_of") if isinstance(weather, dict) else None
+        if not as_of:
+            as_of = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+        self._send_json(200, {
+            "status": "ok",
+            "as_of": as_of,
+            "weather": weather,
+            "options": out_options,
+            "rules_version": flood.RULES["version"],
+            "attribution": "Flood data: Project NOAH (UP Resilience Institute), ODbL · Weather: Open-Meteo",
+        })
 
     def _send_json(self, code: int, body: dict):
         payload = json.dumps(body, ensure_ascii=False, default=_json_default).encode("utf-8")
