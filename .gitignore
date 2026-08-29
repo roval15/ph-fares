@@ -2,3 +2,6 @@
 data/geocode_cache.json
 data/community_updates.jsonl
 data/poi_cache.json
+
+# NOAH flood shapefile (build-time source, ODbL) — not committed
+data/flood/src/
